@@ -1,13 +1,14 @@
-export async function loginUser(credentials: { email: string; password: string }) {
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-  if (!res.ok) throw new Error('Login failed');
-  return res.json();
-}
+import axios from 'axios';
 
-export async function logoutUser() {
-  await fetch('/api/auth/logout', { method: 'POST' });
-}
+const authApi = {
+  async login(credentials: { email: string; otp: string }) {
+    const res = await axios.post('/api/auth/login', credentials);
+    return res.data;
+  },
+  async logout() {
+    await axios.post('/api/auth/logout');
+  },
+};
+
+export { authApi };
+export default authApi;

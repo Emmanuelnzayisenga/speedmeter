@@ -5,23 +5,18 @@ import { logout } from "@/lib/redux/authSlice";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
-import { initiateOtpFlow, clearAuthFlow } from "@/lib/redux/authFlowSlice";
+import { clearAuthFlow } from "@/lib/redux/authFlowSlice";
 
 export function useLogin() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
   return useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      authApi.initLogin(email, password),
+  
+  
     onSuccess: (data) => {
       toast.success("Login initiated! Please check your email for OTP.");
-      dispatch(
-        initiateOtpFlow({
-          identifier: data.user.email,
-          flowType: "LOGIN_OTP",
-        }),
-      );
+  
       router.push(
         `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=LOGIN_OTP`,
       );
@@ -34,7 +29,7 @@ export function useLogin() {
 
 export function useResendOtp() {
   return useMutation({
-    mutationFn: authApi.resendOtp,
+   
     onSuccess: (data) => {
       toast.success("OTP code sent successfully!");
     },
@@ -79,15 +74,10 @@ export function useRegister() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: authApi.register,
+     
     onSuccess: (data) => {
       toast.success("Registration successful! Please verify your email.");
-      dispatch(
-        initiateOtpFlow({
-          identifier: data.user.email,
-          flowType: "REGISTRATION",
-        }),
-      );
+ 
       router.push(
         `/verify-otp?email=${encodeURIComponent(data.user.email)}&type=REGISTRATION`,
       );
@@ -101,7 +91,7 @@ export function useRegister() {
 export function useVerifyResetPasswordToken() {
   const router = useRouter();
   return useMutation({
-    mutationFn: authApi.verifyResetPasswordToken,
+  
     onSuccess: (data) => {
       toast.success("Verification done successfully! redirecting ...");
       router.push(
@@ -117,7 +107,7 @@ export function useVerifyResetPasswordToken() {
 export function useCheckVerifyResetPasswordToken() {
   const router = useRouter();
   return useMutation({
-    mutationFn: authApi.checkVerifyResetPasswordToken,
+  
     onSuccess: (data) => {
       toast.success("Verification done successfully!");
     },
@@ -131,7 +121,7 @@ export function useCheckVerifyResetPasswordToken() {
 export function useVerifyRegistration() {
   const router = useRouter();
   return useMutation({
-    mutationFn: authApi.verifyRegistration,
+    
     onSuccess: (data) => {
       toast.success("Email verified successfully! You can now log in.");
       if (data.token) {
@@ -149,7 +139,7 @@ export function useVerifyRegistration() {
 export function useForgotPassword() {
   const router = useRouter();
   return useMutation({
-    mutationFn: ({ email }: { email: string }) => authApi.forgetPassword(email),
+ 
     onSuccess: (data) => {
       toast.success(
         data.message || "Password reset email sent! Please check your inbox.",
@@ -170,7 +160,7 @@ export function useResetPassword() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (resetData: any) => authApi.resetPassword(resetData),
+   
     onSuccess: (data) => {
       toast.success(
         data.message ||
