@@ -38,8 +38,14 @@ const authFlowSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    clearAuthFlow(state) {
+      state.currentStep = 'login';
+      state.email = '';
+      state.loading = false;
+      state.error = null;
+    },
   },
 });
 
-export const { setStep, setEmail, setLoading, setError, resetFlow } = authFlowSlice.actions;
+export const { setStep, setEmail, setLoading, setError, resetFlow, clearAuthFlow } = authFlowSlice.actions;
 export default authFlowSlice.reducer;
