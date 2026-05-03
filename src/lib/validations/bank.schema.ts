@@ -1,7 +1,7 @@
-import { CardNetwork } from "@/app/generated/prisma/enums";
-import { AccountStatus } from "@/app/generated/prisma/enums";
+import { CardNetwork } from "@/app/generated/prisma";
+import { AccountStatus } from "@/app/generated/prisma";
 import * as z from "zod";
-import { CardStatus } from "@/app/generated/prisma/enums";
+import { CardStatus } from "@/app/generated/prisma";
 
 
 const createBankSchema = z.object({

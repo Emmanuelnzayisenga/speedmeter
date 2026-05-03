@@ -1,4 +1,4 @@
-import { AccountStatus, CardStatus } from "@/app/generated/prisma/enums";
+import { AccountStatus, CardStatus } from "@/app/generated/prisma";
 import * as z from "zod";
 const phoneRegex = new RegExp(
   /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/,

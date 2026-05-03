@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { TokenType } from "@/app/generated/prisma/enums";
+import { TokenType } from "@/app/generated/prisma";
 
 // 1. Reusable regex/rules
 const phoneRegex = new RegExp(
