@@ -1,0 +1,139 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id
+  firstName      String    @map("first_name") @db.VarChar(255)
+  middleName     String?   @map("middle_name") @db.VarChar(255)
+  lastName       String?   @map("last_name") @db.VarChar(255)
+  dob            DateTime? @db.Date
+  phoneNumber    String    @unique @map("phone_number") @db.VarChar(20)
+  isActive       Boolean   @default(false) @map("is_active")
+  profilePicture String?   @map("profile_picture") @db.VarChar(255)
+  email          String    @unique @map("email") @db.VarChar(255)
+  lastLogin      DateTime? @map("last_login")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  password       String    @db.Text
+  timezoneId     Int       @default(1) @map("userTimezone")
+}
+
+model Vehicle {
+  id          String        @id @default(cuid())
+  name        String
+  plateNumber String        @unique
+  type        VehicleType   @default(CAR)
+  status      VehicleStatus @default(INACTIVE)
+  driverName  String?
+  driverPhone String?
+  deviceId    String?       @unique
+  color       String?       @default("#3B82F6")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  locations  VehicleLocation[]
+  violations Violation[]
+
+  @@index([status])
+  @@index([deviceId])
+}
+
+model VehicleLocation {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  latitude   Float
+  longitude  Float
+  speed      Float    @default(0)
+  heading    Float?
+  altitude   Float?
+  accuracy   Float?
+  satellites Int?
+  timestamp  DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([timestamp])
+  @@index([vehicleId, timestamp])
+}
+
+model SpeedZone {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  speedLimit  Float
+  coordinates Json // Array of {lat, lng} for polygon OR {lat, lng, radius} for circle
+  zoneType    ZoneType @default(POLYGON)
+  color       String   @default("#EF4444")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  violations Violation[]
+
+  @@index([active])
+}
+
+model Violation {
+  id          String          @id @default(cuid())
+  vehicleId   String
+  zoneId      String?
+  latitude    Float
+  longitude   Float
+  speed       Float
+  speedLimit  Float
+  excessSpeed Float
+  fineAmount  Float           @default(0)
+  status      ViolationStatus @default(PENDING)
+  notes       String?
+  timestamp   DateTime        @default(now())
+  resolvedAt  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  vehicle Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  zone    SpeedZone? @relation(fields: [zoneId], references: [id])
+
+  @@index([vehicleId])
+  @@index([status])
+  @@index([timestamp])
+}
+
+enum VehicleType {
+  CAR
+  TRUCK
+  MOTORCYCLE
+  BUS
+  VAN
+  OTHER
+}
+
+enum VehicleStatus {
+  ACTIVE
+  INACTIVE
+  MOVING
+  SPEEDING
+  OFFLINE
+}
+
+enum ZoneType {
+  POLYGON
+  CIRCLE
+  CORRIDOR
+}
+
+enum ViolationStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  RESOLVED
+  CANCELLED
+}
