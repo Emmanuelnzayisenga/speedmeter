@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
         altitude: altitude ? parseFloat(altitude) : null,
         accuracy: accuracy ? parseFloat(accuracy) : null,
         satellites: satellites ? parseInt(satellites) : null,
-        timestamp: timestamp ? new Date(timestamp) : new Date(),
+        timestamp: timestamp ? new Date() : new Date(),
       },
     })
 
@@ -180,7 +180,7 @@ export async function PUT(req: NextRequest) {
             longitude: reading.longitude,
             speed: reading.speed,
             heading: reading.heading,
-            timestamp: reading.timestamp ? new Date(reading.timestamp) : new Date(),
+            timestamp: reading.timestamp ? new Date() : new Date(),
           },
         })
 
