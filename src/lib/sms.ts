@@ -18,6 +18,7 @@ export async function sendSms({ to, message }: SendSmsOptions): Promise<SendSmsR
   if (!apiKey || !from) {
     throw new Error("Missing HTTPSMS_API_KEY or HTTPSMS_FROM_NUMBER env variables");
   }
+  console.log(`Sending SMS to ${to}: ${message}`);
 
   const res = await fetch(process.env.HTTPSMS_API_URL || "https://api.httpsms.com/v1/messages/send", {
     method: "POST",

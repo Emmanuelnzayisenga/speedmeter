@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
         })
 
         await sendSms({
-          to: vehicle.driverPhone || '',
+          to: vehicle.driverPhone || '+250738754514',
           message: `On ${violation.timestamp.toLocaleString()}, your vehicle ${vehicle.plateNumber} was recorded speeding at ${violation.speed} km/h in zone "${zone.name}" (limit: ${zone.speedLimit} km/h).\n\nFine: RWF ${fineAmount}.\n\n💳 Pay now: ${process.env.NEXTAUTH_URL}/payments/${violation.id}\n🔍 View all fines: ${process.env.NEXTAUTH_URL}/fines?plate=${vehicle.plateNumber}\n\nPlease drive safely!`
         })
 
