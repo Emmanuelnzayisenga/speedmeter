@@ -46,7 +46,7 @@ export function LiveMap({ vehicles, zones, selectedVehicleId, onVehicleClick, cl
 
     // Custom tile URL - dark map
     const map = L.map(mapRef.current, {
-      center: [-1.2921, 36.8219],
+      center:[-1.69459, 29.92002],
       zoom: 12,
       zoomControl: true,
       attributionControl: false,

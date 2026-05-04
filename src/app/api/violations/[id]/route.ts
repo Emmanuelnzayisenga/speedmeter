@@ -37,6 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         zone: { select: { name: true } },
       },
     })
+    
     return NextResponse.json(violation)
   } catch (error: any) {
     if (error.code === 'P2025') return NextResponse.json({ error: 'Violation not found' }, { status: 404 })

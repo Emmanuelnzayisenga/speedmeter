@@ -15,8 +15,10 @@ import { formatDate, formatCurrency, formatSpeed, VEHICLE_TYPE_ICONS, cn } from 
 import {
   Search, AlertTriangle, DollarSign, ChevronLeft, ChevronRight,
   RefreshCw, MapPin, Gauge, Car, Filter, Eye, Edit, Trash2,
-  CheckCircle, XCircle, Clock, FileText
+  CheckCircle, XCircle, Clock, FileText,
+  Wallet
 } from 'lucide-react'
+import Link from 'next/link'
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'DISPUTED', 'RESOLVED', 'CANCELLED']
 const STATUS_BADGE: Record<string, any> = {
@@ -179,6 +181,7 @@ export default function ViolationsPage() {
                 <TableHead className="text-xs tracking-wider">FINE</TableHead>
                 <TableHead className="text-xs tracking-wider">STATUS</TableHead>
                 <TableHead className="text-xs tracking-wider">DATE</TableHead>
+                <TableHead className="text-xs tracking-wider">Action</TableHead>
                 <TableHead className="w-28"></TableHead>
               </TableRow>
             </TableHeader>
@@ -249,21 +252,31 @@ export default function ViolationsPage() {
                       <span className="text-[10px] text-muted-foreground">{formatDate(v.timestamp)}</span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setDetailViolation(v)}>
-                          <Eye className="w-3 h-3" />
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDetailViolation(v)}>
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(v)}>
-                          <Edit className="w-3 h-3" />
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(v)}>
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        {v.status === 'PENDING' && (
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-sw-safe" onClick={() => quickResolve(v.id)}>
-                            <CheckCircle className="w-3 h-3" />
+                        {(v.status === "PENDING" || v.status === "CONFIRMED") && (
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950" onClick={() => quickResolve(v.id)}>
+                            <CheckCircle className="h-3.5 w-3.5" />
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-sw-danger" onClick={() => setDeleteId(v.id)}>
-                          <Trash2 className="w-3 h-3" />
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(v.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
+
+                        {(v.status === 'CONFIRMED' || v.status === "PENDING") && (
+                          <Button asChild size="sm" className="h-7 gap-1.5 px-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">
+                            <Link href={`/payments/${v.id}`}>
+                              <Wallet className="h-3.5 w-3.5" />
+                              Pay
+                            </Link>
+                          </Button>
+                        )}
+
                       </div>
                     </TableCell>
                   </TableRow>

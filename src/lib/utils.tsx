@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Truck, Car,Bike, Bus  } from "lucide-react"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -62,13 +63,13 @@ export function pointInCircle(
   return haversineDistance(lat, lng, centerLat, centerLng) <= radiusMeters
 }
 
-export const VEHICLE_TYPE_ICONS: Record<string, string> = {
-  CAR: '🚗',
-  TRUCK: '🚛',
-  MOTORCYCLE: '🏍️',
-  BUS: '🚌',
-  VAN: '🚐',
-  OTHER: '🚙',
+export const VEHICLE_TYPE_ICONS: Record<string, any> = {
+  CAR: <Car/>,
+  TRUCK: <Truck/>,
+  MOTORCYCLE: <Bike/>,
+  BUS: <Bus/>,
+  VAN: <Car/>,
+  OTHER: <Car/>,
 }
 
 export const STATUS_COLORS: Record<string, string> = {

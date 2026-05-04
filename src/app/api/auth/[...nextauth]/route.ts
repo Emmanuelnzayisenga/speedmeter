@@ -9,24 +9,27 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { 
+        username: { 
           label: "Email/Phone", 
           type: "text", 
           placeholder: "email@example.com or phone number" 
         },
        
-        otp: { 
-          label: "Password", 
-          type: "password" 
+         password: { 
+          label: "password", 
+          type: "text", 
+          placeholder: "password" 
         },
       },
       async authorize(credentials, req) {
+        console.log(JSON.stringify(credentials)+"kjbfjkdbgjfj")
+        
         try {
           const res = await axios.post(
-            `${process.env.NEXTAUTH_URL}/${process.env.NEXT_PUBLIC_API_URL}/auth/finalize-login`,
+            `${process.env.NEXTAUTH_URL}/api/auth/login`,
             {
-              email: credentials?.email,
-              otp: credentials?.otp,
+            username: credentials?.username,
+            password:credentials?.password
             }
           );
           

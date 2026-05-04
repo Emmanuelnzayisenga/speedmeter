@@ -6,16 +6,19 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   Activity, Map, Car, AlertTriangle, BarChart2, Settings,
-  Radio, ChevronLeft, ChevronRight, Gauge, Shield, Menu, X
+  Radio, ChevronLeft, ChevronRight, Gauge, Shield, Menu, X,
+  LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SessionProvider } from 'next-auth/react'
 
 const navItems = [
-  { href: '/', label: 'Live Monitor', icon: Activity, badge: 'LIVE' },
+  { href: '/dashboard', label: 'Live Monitor', icon: Activity, badge: 'LIVE' },
   { href: '/map', label: 'Zone Manager', icon: Map },
   { href: '/vehicles', label: 'Vehicles', icon: Car },
   { href: '/violations', label: 'Violations', icon: AlertTriangle },
   { href: '/analytics', label: 'Analytics', icon: BarChart2 },
+  { href: '/logout', label: 'Logout', icon: LogOut },
 ]
 
 interface AppLayoutProps {
@@ -28,6 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
+    <SessionProvider>
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Mobile overlay */}
       {mobileOpen && (
@@ -54,7 +58,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center">
               <Gauge className="w-4 h-4 text-primary" />
             </div>
-            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-sw-safe animate-ping-slow" />
+         
           </div>
           {!collapsed && (
             <div className="min-w-0">
@@ -174,5 +178,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         </main>
       </div>
     </div>
+    </SessionProvider>
   )
 }

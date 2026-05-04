@@ -124,19 +124,14 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  firstName: 'firstName',
-  middleName: 'middleName',
-  lastName: 'lastName',
-  dob: 'dob',
+  username: 'username',
+  email: 'email',
   phoneNumber: 'phoneNumber',
   isActive: 'isActive',
-  profilePicture: 'profilePicture',
-  email: 'email',
   lastLogin: 'lastLogin',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  password: 'password',
-  timezoneId: 'timezoneId'
+  password: 'password'
 };
 
 exports.Prisma.VehicleScalarFieldEnum = {
@@ -241,7 +236,8 @@ exports.VehicleStatus = exports.$Enums.VehicleStatus = {
 exports.ZoneType = exports.$Enums.ZoneType = {
   POLYGON: 'POLYGON',
   CIRCLE: 'CIRCLE',
-  CORRIDOR: 'CORRIDOR'
+  CORRIDOR: 'CORRIDOR',
+  ROAD: 'ROAD'
 };
 
 exports.ViolationStatus = exports.$Enums.ViolationStatus = {

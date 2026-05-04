@@ -10,20 +10,18 @@ datasource db {
 }
 
 model User {
-  id             String    @id
-  firstName      String    @map("first_name") @db.VarChar(255)
-  middleName     String?   @map("middle_name") @db.VarChar(255)
-  lastName       String?   @map("last_name") @db.VarChar(255)
-  dob            DateTime? @db.Date
-  phoneNumber    String    @unique @map("phone_number") @db.VarChar(20)
-  isActive       Boolean   @default(false) @map("is_active")
-  profilePicture String?   @map("profile_picture") @db.VarChar(255)
-  email          String    @unique @map("email") @db.VarChar(255)
-  lastLogin      DateTime? @map("last_login")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
-  password       String    @db.Text
-  timezoneId     Int       @default(1) @map("userTimezone")
+  id String @id
+
+  username    String?   @map("username") @db.VarChar(255)
+  email       String    @map("email") @db.VarChar(255)
+  phoneNumber String    @map("phone_number") @db.VarChar(20)
+  isActive    Boolean   @default(false) @map("is_active")
+  lastLogin   DateTime? @map("last_login")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  password    String    @db.Text
+
+  @@unique([username, email])
 }
 
 model Vehicle {
@@ -128,6 +126,7 @@ enum ZoneType {
   POLYGON
   CIRCLE
   CORRIDOR
+  ROAD
 }
 
 enum ViolationStatus {
