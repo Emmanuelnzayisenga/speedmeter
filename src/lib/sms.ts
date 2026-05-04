@@ -34,6 +34,7 @@ export async function sendSms({ to, message }: SendSmsOptions): Promise<SendSmsR
   });
 
   const data = await res.json();
+  console.log("SMS API response:", data);
 
   if (!res.ok) {
     return {
