@@ -180,7 +180,7 @@ export async function PUT(req: NextRequest) {
             longitude: reading.longitude,
             speed: reading.speed,
             heading: reading.heading,
-            timestamp: reading.timestamp ? new Date(reading.timestamp) : new Date(),
+            timestamp:  new Date(),
           },
         })
 
