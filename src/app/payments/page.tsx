@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   X,
   Banknote,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type ViolationStatus = "PENDING" | "CONFIRMED";
 
@@ -42,10 +42,9 @@ interface Violation {
   zone: { name: string } | null;
 }
 
-// ─── Status pill ──────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<ViolationStatus, string> = {
-  PENDING:   "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-400",
+  PENDING: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-400",
   CONFIRMED: "text-red-700 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400",
 };
 
@@ -58,7 +57,6 @@ function StatusPill({ status }: { status: ViolationStatus }) {
   );
 }
 
-// ─── Violation result card ────────────────────────────────────────────────────
 
 function ViolationCard({ v }: { v: Violation }) {
   return (
@@ -66,9 +64,7 @@ function ViolationCard({ v }: { v: Violation }) {
       <div className={cn("h-0.5 w-full", v.status === "CONFIRMED" ? "bg-destructive" : "bg-amber-400")} />
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
-          {/* Left: details */}
           <div className="min-w-0 flex-1 space-y-3">
-            {/* Vehicle + status */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1.5">
                 <Car className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -79,7 +75,6 @@ function ViolationCard({ v }: { v: Violation }) {
               <StatusPill status={v.status} />
             </div>
 
-            {/* Speed row */}
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-1.5 rounded-md bg-destructive/8 border border-destructive/20 px-2.5 py-1">
                 <Gauge className="h-3.5 w-3.5 text-destructive" />
@@ -136,10 +131,10 @@ export default function PaymentsPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [plate, setPlate]           = useState("");
+  const [plate, setPlate] = useState("");
   const [violations, setViolations] = useState<Violation[] | null>(null);
-  const [searched, setSearched]     = useState(false);
-  const [error, setError]           = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const totalDue = violations?.reduce((s, v) => s + v.fineAmount, 0) ?? 0;
@@ -181,16 +176,16 @@ export default function PaymentsPage() {
   };
 
   const hasResults = violations !== null && violations.length > 0;
-  const showIdle   = !isPending && !searched;
-  const showEmpty  = !isPending && searched && !error && violations?.length === 0;
+  const showIdle = !isPending && !searched;
+  const showEmpty = !isPending && searched && !error && violations?.length === 0;
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-background">
-      {/*
-       * Layout strategy:
-       * – Before search: search box is vertically centred in the full viewport
-       * – After search:  search box pins to top, results scroll below
-       */}
+      <div className="flex m-2">
+        <button className="text-primary font-bolder" onClick={() => {
+          window.navigation.back()
+        }}> <ArrowLeft /></button>
+      </div>
       <div
         className={cn(
           "flex flex-col w-full transition-all",

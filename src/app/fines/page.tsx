@@ -22,6 +22,7 @@ import {
   Loader2,
   SlidersHorizontal,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,17 +72,17 @@ const STATUS_CONFIG: Record<
   ViolationStatus,
   { label: string; color: string; icon: React.ElementType; dot: string }
 > = {
-  PENDING:   { label: "Pending",   color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800",   icon: Clock,         dot: "bg-amber-500"  },
-  CONFIRMED: { label: "Confirmed", color: "text-red-600 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800",             icon: AlertTriangle, dot: "bg-red-500"    },
-  DISPUTED:  { label: "Disputed",  color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800",        icon: FileText,      dot: "bg-blue-500"   },
-  RESOLVED:  { label: "Resolved",  color: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800", icon: CheckCircle2, dot: "bg-emerald-500" },
-  CANCELLED: { label: "Cancelled", color: "text-muted-foreground bg-muted border-border",                                              icon: XCircle,       dot: "bg-muted-foreground" },
+  PENDING: { label: "Pending", color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800", icon: Clock, dot: "bg-amber-500" },
+  CONFIRMED: { label: "Confirmed", color: "text-red-600 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800", icon: AlertTriangle, dot: "bg-red-500" },
+  DISPUTED: { label: "Disputed", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800", icon: FileText, dot: "bg-blue-500" },
+  RESOLVED: { label: "Resolved", color: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800", icon: CheckCircle2, dot: "bg-emerald-500" },
+  CANCELLED: { label: "Cancelled", color: "text-muted-foreground bg-muted border-border", icon: XCircle, dot: "bg-muted-foreground" },
 };
 
 const SEARCH_MODES: { value: SearchMode; label: string; icon: React.ElementType; placeholder: string }[] = [
-  { value: "plate",  label: "Plate Number",  icon: Car,   placeholder: "e.g. RAC 123A" },
-  { value: "phone",  label: "Phone Number",  icon: Phone, placeholder: "e.g. +250 789 123 456" },
-  { value: "id",     label: "Violation ID",  icon: Hash,  placeholder: "e.g. clx8f..." },
+  { value: "plate", label: "Plate Number", icon: Car, placeholder: "e.g. RAC 123A" },
+  { value: "phone", label: "Phone Number", icon: Phone, placeholder: "e.g. +250 789 123 456" },
+  { value: "id", label: "Violation ID", icon: Hash, placeholder: "e.g. clx8f..." },
 ];
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -198,16 +199,16 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
 // ─── Stats summary ────────────────────────────────────────────────────────────
 
 function ResultsSummary({ violations }: { violations: Violation[] }) {
-  const pending   = violations.filter(v => v.status === "PENDING" || v.status === "CONFIRMED");
-  const totalDue  = pending.reduce((s, v) => s + v.fineAmount, 0);
-  const resolved  = violations.filter(v => v.status === "RESOLVED").length;
+  const pending = violations.filter(v => v.status === "PENDING" || v.status === "CONFIRMED");
+  const totalDue = pending.reduce((s, v) => s + v.fineAmount, 0);
+  const resolved = violations.filter(v => v.status === "RESOLVED").length;
 
   return (
     <div className="grid grid-cols-3 gap-3">
       {[
         { label: "Total Violations", value: violations.length, icon: ShieldAlert, color: "text-foreground" },
-        { label: "Unpaid Fines",     value: `RWF ${totalDue.toLocaleString()}`, icon: Banknote, color: "text-destructive" },
-        { label: "Resolved",         value: resolved, icon: CheckCircle2, color: "text-emerald-600" },
+        { label: "Unpaid Fines", value: `RWF ${totalDue.toLocaleString()}`, icon: Banknote, color: "text-destructive" },
+        { label: "Resolved", value: resolved, icon: CheckCircle2, color: "text-emerald-600" },
       ].map(({ label, value, icon: Icon, color }) => (
         <Card key={label}>
           <CardContent className="p-3 text-center">
@@ -225,13 +226,13 @@ function ResultsSummary({ violations }: { violations: Violation[] }) {
 
 export default function CheckFinesPage() {
   const router = useRouter();
-  const [mode, setMode]             = useState<SearchMode>("plate");
-  const [query, setQuery]           = useState("");
+  const [mode, setMode] = useState<SearchMode>("plate");
+  const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ViolationStatus | "ALL">("ALL");
   const [violations, setViolations] = useState<Violation[] | null>(null);
-  const [searched, setSearched]     = useState(false);
+  const [searched, setSearched] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [error, setError]           = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const currentMode = SEARCH_MODES.find(m => m.value === mode)!;
 
@@ -276,13 +277,16 @@ export default function CheckFinesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Hero search section ── */}
-      <div className="border-b bg-muted/30">
+      <div className="flex m-2">
+        <button className="text-primary font-bolder" onClick={() => {
+          window.navigation.back()
+        }}> <ArrowLeft /></button>
+      </div>
+      <div className="border-b bg-muted/30 h-full">
         <div className="mx-auto max-w-2xl px-4 py-8 space-y-5">
-          {/* Title */}
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
-              <ShieldAlert className="h-5 w-5 text-destructive" />
+              <ShieldAlert className="h-5 w-5 text-primary" />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">Traffic Fine Lookup</h1>
@@ -290,7 +294,6 @@ export default function CheckFinesPage() {
             </div>
           </div>
 
-          {/* Mode tabs */}
           <Tabs value={mode} onValueChange={(v) => { setMode(v as SearchMode); setQuery(""); }}>
             <TabsList className="w-full">
               {SEARCH_MODES.map(m => {
@@ -305,7 +308,6 @@ export default function CheckFinesPage() {
             </TabsList>
           </Tabs>
 
-          {/* Search input */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <currentMode.icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

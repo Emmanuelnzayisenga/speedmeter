@@ -108,7 +108,6 @@ export default function VehiclesPage() {
   return (
     <AppLayout>
       <div className="p-4 lg:p-6 space-y-5 animate-fade-up">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display font-bold tracking-wider">FLEET VEHICLES</h1>
@@ -119,7 +118,6 @@ export default function VehiclesPage() {
           </Button>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -145,8 +143,8 @@ export default function VehiclesPage() {
           </Button>
         </div>
 
-        {/* Table */}
-        <div className="rounded-lg border border-border bg-card overflow-hidden panel-glow">
+        {/* Desktop table */}
+        <div className="hidden md:block rounded-lg border border-border bg-card overflow-hidden panel-glow">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -254,7 +252,110 @@ export default function VehiclesPage() {
           </Table>
         </div>
 
-        {/* Pagination */}
+        {/* Mobile card grid */}
+        <div className="md:hidden space-y-3">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <div className="h-5 rounded shimmer w-1/2" />
+                <div className="grid grid-cols-2 gap-2">
+                  {Array.from({ length: 6 }).map((_, j) => (
+                    <div key={j} className="h-4 rounded shimmer" />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : vehicles.length === 0 ? (
+            <div className="rounded-lg border border-border bg-card py-12 flex flex-col items-center gap-2 text-muted-foreground">
+              <Car className="w-10 h-10 opacity-20" />
+              <p className="text-sm">No vehicles found</p>
+              <Button variant="outline" size="sm" onClick={openCreate}>Add first vehicle</Button>
+            </div>
+          ) : vehicles.map(v => (
+            <div key={v.id} className="rounded-lg border border-border bg-card overflow-hidden panel-glow">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="w-8 h-8 rounded-md flex items-center justify-center text-sm flex-shrink-0"
+                    style={{ backgroundColor: `${v.color}20`, border: `1px solid ${v.color}40` }}
+                  >
+                    {VEHICLE_TYPE_ICONS[v.type]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium leading-tight">{v.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{v.type}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(v)}>
+                    <Edit className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-sw-danger hover:text-sw-danger"
+                    onClick={() => { setDeletingId(v.id); setDeleteDialogOpen(true) }}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3">
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Plate</p>
+                  <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded inline-block">{v.plateNumber}</span>
+                </div>
+
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Status</p>
+                  <Badge variant={STATUS_BADGE[v.status] || 'default'} className="text-[10px]">
+                    {v.status}
+                  </Badge>
+                </div>
+
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Driver</p>
+                  {v.driverName ? (
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                      <span className="text-xs truncate">{v.driverName}</span>
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </div>
+
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Device</p>
+                  {v.deviceId ? (
+                    <div className="flex items-center gap-1.5">
+                      <Cpu className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="text-xs font-mono truncate">{v.deviceId}</span>
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">Not assigned</span>}
+                </div>
+
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Last Speed</p>
+                  {v.locations?.[0] ? (
+                    <div className="flex items-center gap-1.5">
+                      <Gauge className={cn("w-3 h-3 flex-shrink-0", v.status === 'SPEEDING' ? 'text-sw-danger' : 'text-muted-foreground')} />
+                      <span className={cn("text-xs font-mono font-bold", v.status === 'SPEEDING' && 'text-sw-danger')}>
+                        {formatSpeed(v.locations[0].speed)}
+                      </span>
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </div>
+
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Violations</p>
+                  {v._count?.violations > 0 ? (
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle className="w-3 h-3 text-sw-danger flex-shrink-0" />
+                      <span className="text-xs font-bold text-sw-danger">{v._count.violations}</span>
+                    </div>
+                  ) : <span className="text-xs text-sw-safe font-medium">Clean</span>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {pagination.totalPages > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
@@ -275,7 +376,6 @@ export default function VehiclesPage() {
         )}
       </div>
 
-      {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -343,7 +443,6 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirm dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>

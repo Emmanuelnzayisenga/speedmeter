@@ -89,14 +89,14 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="flex flex-col h-full">
         {/* Ticker bar */}
-        <div className="h-8 bg-sw-nav border-b border-border/50 flex items-center overflow-hidden flex-shrink-0 py-2">
+        <div className="h-8 bg-sw-nav border-b border-border/50 flex items-center overflow-hidden flex-shrink-0 py-2 h-10">
           <div className="flex-shrink-0 px-3 border-r border-border/50 h-full flex items-center">
             <span className="text-[10px] font-mono font-bold text-primary tracking-widest">LIVE FEED</span>
           </div>
-          <div className="ticker-wrap flex-1 px-4">
+          <div className="ticker-wrap flex-1 justify-center px-4">
             <div className="ticker-content flex items-center gap-8 text-[10px] font-mono text-muted-foreground">
               {vehicles.map(v => (
-                <span key={v.id} className={cn(v.status === 'SPEEDING' && 'text-sw-danger py-3')}>
+                <span key={v.id} className={cn(v.status === 'SPEEDING' && 'text-sw-danger py-5')}>
                   {VEHICLE_TYPE_ICONS[v.type]} {v.plateNumber} — {Math.round(v.locations?.[0]?.speed || 0)} km/h
                   {v.status === 'SPEEDING' && ' ⚠ SPEEDING'}
                 </span>

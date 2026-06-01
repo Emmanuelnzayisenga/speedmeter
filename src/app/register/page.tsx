@@ -8,10 +8,11 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 export const dynamic = "force-dynamic";
 
-function Page() {
+function Page(this: any) {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -19,8 +20,8 @@ function Page() {
     phoneNumber: "",
   });
   const [pending, setPending] = useState(false);
-  const[error,setError]= useState<string|null>(null)
-  const router= useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,29 +40,29 @@ function Page() {
 
       const response = await axios.post("/api/auth/register", formData);
       if (response.status !== 200) {
-         setError(response.data.error??"Registration failed. Please try again.")
+        setError(response.data.error ?? "Registration failed. Please try again.")
         return;
       }
 
       // Auto-login after successful registration
       const resp = await signIn("credentials", {
-        "username":formData.username,
-        "password":formData.password,
-        redirect:false
-      }, )
+        "username": formData.username,
+        "password": formData.password,
+        redirect: false
+      },)
       console.log(resp)
-      if(resp?.ok){
+      if (resp?.ok) {
         router.push("/dashboard")
       }
-      if(resp?.error){
-        if(resp.status==401)
-        setError("Invalid username or password")
-      else{
-        setError("Failed to login please try again later")
-      }
+      if (resp?.error) {
+        if (resp.status == 401)
+          setError("Invalid username or password")
+        else {
+          setError("Failed to login please try again later")
+        }
       }
 
-       
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message ?? "Registration failed.");
@@ -76,7 +77,7 @@ function Page() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-2xl font-bold mb-4">Register</h1>
-    
+
       <form
         className="bg-background p-6 rounded shadow-md w-full max-w-sm border"
         autoComplete="off"
@@ -96,13 +97,27 @@ function Page() {
 
         <div className="flex flex-col gap-2 mt-4">
           <label htmlFor="phoneNumber">Phone Number</label>
-          <Input
-            onChange={handleChange}
-            type="text"
-            id="phoneNumber"
-            name="phoneNumber"
-            placeholder="Enter your phone number"
-            autoComplete="off"
+
+          <PhoneInput
+            containerStyle={{ width: "100%" }}
+            inputStyle={{
+              color: "black",
+              width:"100%"
+            }}
+            enableTerritories
+            enableSearch
+            enableAreaCodes
+            countryCodeEditable={false}
+            enableLongNumbers
+            inputProps={{
+              name: 'phone',
+              required: true,
+              autoFocus: true
+            }}
+            country={'rw'}
+            value={formData.phoneNumber}
+            onChange={(phone) => setFormData({ ...formData, phoneNumber: phone })}
+           
           />
         </div>
 
@@ -129,10 +144,10 @@ function Page() {
             autoComplete="off"
           />
         </div>
-       {error && (
+        {error && (
           <p className="text-sm text-red-500 mt-2">{error}</p>
         )}
-        
+
 
         <Button className="p-2 w-full mt-4" disabled={pending}>
           {pending ? <Loader2 className="animate-spin mr-2" /> : null}
