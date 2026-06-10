@@ -1,12 +1,10 @@
 import { WebSocketServer, WebSocket } from "ws";
 import axios from "axios";
 
-// ─── Config ────────────────────────────────────────────────────────────────
-const PORT           = 3001;
+const PORT           = process.env.PORT || 3001;
 const SPEED_LIMIT    = 60;
-const SERVER_ADDRESS = "http://localhost:3000";
+const SERVER_ADDRESS = "https://speedmeter-rceq.onrender.com";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
 function ts() {
   return new Date().toISOString();
 }
@@ -29,26 +27,16 @@ async function safePost(label, url, body) {
     return res;
   } catch (err) {
     if (err.response) {
-      // Server replied with non-2xx
-      log(
-        "❌ HTTP",
-        `POST ${label} FAILED`,
-        `status=${err.response.status} body=${JSON.stringify(err.response.data)}`
-      );
+      log("❌ HTTP", `POST ${label} FAILED`, `status=${err.response.status} body=${JSON.stringify(err.response.data)}`);
     } else if (err.code === "ECONNREFUSED") {
-      log(
-        "❌ HTTP",
-        `POST ${label} FAILED`,
-        `ECONNREFUSED — is the REST server running at ${SERVER_ADDRESS}?`
-      );
+      log("❌ HTTP", `POST ${label} FAILED`, `ECONNREFUSED — is the REST server running at ${SERVER_ADDRESS}?`);
     } else {
       log("❌ HTTP", `POST ${label} FAILED`, `err=${err.message}`);
     }
-    return null; // Don't rethrow — let caller continue
+    return null;
   }
 }
 
-// ─── Server ─────────────────────────────────────────────────────────────────
 const wss = new WebSocketServer({ port: PORT, path: "/ws/gps" });
 
 log("🚀 WS", `GPS WebSocket Server listening`, `port=${PORT} path=/ws/gps`);
@@ -59,18 +47,15 @@ wss.on("connection", (ws, req) => {
   logSection(`NEW CONNECTION`);
   log("🔌 WS", "Client connected", `ip=${clientIp}`);
 
-  // ── Per-connection state ──────────────────────────────────────────────────
-  let deviceId     = null;
-  let msgCount     = 0;
-  let gpsCount     = 0;
-  let violCount    = 0;
-  let connectedAt  = Date.now();
+  let deviceId    = null;
+  let msgCount    = 0;
+  let gpsCount    = 0;
+  let violCount   = 0;
+  let connectedAt = Date.now();
 
-  // ── Message handler ───────────────────────────────────────────────────────
   ws.on("message", async (rawMessage) => {
     msgCount++;
 
-    // 1. Decode buffer → string
     const raw = rawMessage instanceof Buffer
       ? rawMessage.toString("utf8")
       : String(rawMessage);
@@ -78,22 +63,19 @@ wss.on("connection", (ws, req) => {
     log("📨 WS", `Message #${msgCount} received`, `bytes=${rawMessage.length}`);
     console.log(`         Raw: ${raw}`);
 
-    // 2. Parse JSON
     let data;
     try {
       data = JSON.parse(raw);
     } catch (parseErr) {
       log("❌ PARSE", "JSON parse failed", `err=${parseErr.message}`);
       console.error("         Raw that failed:", raw);
-      return; // Stop here — no point continuing
+      return;
     }
 
     log("✅ PARSE", `type=${data.type}`, `deviceId=${data.deviceId ?? "?"}`);
 
-    // 3. Route by type
     switch (data.type) {
 
-      // ── register ──────────────────────────────────────────────────────────
       case "register": {
         deviceId = data.deviceId;
         logSection(`DEVICE REGISTERED`);
@@ -109,7 +91,6 @@ wss.on("connection", (ws, req) => {
         break;
       }
 
-      // ── gps ───────────────────────────────────────────────────────────────
       case "gps": {
         gpsCount++;
         logSection(`GPS FRAME #${gpsCount}`);
@@ -119,14 +100,12 @@ wss.on("connection", (ws, req) => {
         log("📍 GPS", `Environment`, `alt=${data.altitude}m sats=${data.satellites}`);
         log("📍 GPS", `Timestamp`,   `${data.timestamp ?? "none"}`);
 
-        // Validate expected fields
         const required = ["deviceId", "latitude", "longitude", "speed"];
         const missing  = required.filter((k) => data[k] == null);
         if (missing.length) {
           log("⚠️  GPS", "Missing required fields", `fields=${missing.join(", ")}`);
         }
 
-        // POST to ingest endpoint
         await safePost("gps/ingest", `${SERVER_ADDRESS}/api/gps/ingest`, {
           deviceId:   data.deviceId,
           latitude:   data.latitude,
@@ -139,7 +118,6 @@ wss.on("connection", (ws, req) => {
           timestamp:  data.timestamp,
         });
 
-        // POST to submit endpoint
         await safePost("submit", `${SERVER_ADDRESS}/api/submit`, {
           deviceId:   data.deviceId,
           latitude:   data.latitude,
@@ -152,7 +130,6 @@ wss.on("connection", (ws, req) => {
           timestamp:  data.timestamp,
         });
 
-        // Broadcast to all other connected clients
         let broadcastCount = 0;
         wss.clients.forEach((client) => {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -178,7 +155,6 @@ wss.on("connection", (ws, req) => {
         break;
       }
 
-      // ── violation ─────────────────────────────────────────────────────────
       case "violation": {
         violCount++;
         const excess = Number(data.speed) - Number(data.speedLimit);
@@ -200,7 +176,6 @@ wss.on("connection", (ws, req) => {
         break;
       }
 
-      // ── unknown ───────────────────────────────────────────────────────────
       default: {
         log("⚠️  WS", `Unknown message type: "${data.type}"`);
         console.log("         Full payload:", JSON.stringify(data, null, 2));
@@ -209,24 +184,19 @@ wss.on("connection", (ws, req) => {
     }
   });
 
-  // ── Disconnect ─────────────────────────────────────────────────────────────
   ws.on("close", (code, reason) => {
     const uptime = ((Date.now() - connectedAt) / 1000).toFixed(1);
     logSection("CLIENT DISCONNECTED");
-    log("🔌 WS", `Client disconnected`,
-      `device=${deviceId ?? "unregistered"} ip=${clientIp} code=${code} uptime=${uptime}s`);
-    log("📊 STATS", `Session totals`,
-      `msgs=${msgCount} gps=${gpsCount} violations=${violCount}`);
+    log("🔌 WS", `Client disconnected`, `device=${deviceId ?? "unregistered"} ip=${clientIp} code=${code} uptime=${uptime}s`);
+    log("📊 STATS", `Session totals`, `msgs=${msgCount} gps=${gpsCount} violations=${violCount}`);
   });
 
-  // ── Error ──────────────────────────────────────────────────────────────────
   ws.on("error", (err) => {
     log("❌ WS", `Socket error`, `device=${deviceId ?? "?"} err=${err.message}`);
     console.error(err);
   });
 });
 
-// ─── Server-level events ────────────────────────────────────────────────────
 wss.on("error", (err) => {
   log("❌ SERVER", "WebSocket server error", `err=${err.message}`);
   console.error(err);
@@ -236,7 +206,6 @@ wss.on("close", () => {
   log("🛑 SERVER", "WebSocket server closed");
 });
 
-// ─── Periodic stats ─────────────────────────────────────────────────────────
 setInterval(() => {
   const connected = [...wss.clients].filter((c) => c.readyState === WebSocket.OPEN).length;
   log("📊 SERVER", "Status", `connectedClients=${connected}`);
