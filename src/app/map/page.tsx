@@ -283,6 +283,7 @@ export default function ZoneManagerPage() {
                 zones={zones}
                 drawMode={drawMode}
                 onZoneDrawn={handleZoneDrawn}
+                 selectedZoneId={selectedZoneId}
                 onZoneClick={setSelectedZoneId}
                 className="w-full h-full"
               />

@@ -127,7 +127,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </Button>
 
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm mx-2">
               <Shield className="w-3.5 h-3.5 text-primary" />
               <span className="text-muted-foreground font-mono text-xs">SpeedWatch</span>
               <span className="text-muted-foreground">/</span>

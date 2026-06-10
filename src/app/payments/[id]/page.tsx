@@ -103,7 +103,7 @@ function DetailRow({
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className={`text-sm font-medium mt-0.5 ${highlight ? "text-destructive" : "text-foreground"}`}>
+        <p className={`text-sm font-medium mt-0.5 ${highlight ? "text-primary" : "text-foreground"}`}>
           {value}
         </p>
       </div>
@@ -238,7 +238,7 @@ export default function PayViolationPage() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-10 pb-8 space-y-4">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-              <XCircle className="h-7 w-7 text-destructive" />
+              <XCircle className="h-7 w-7 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-semibold">Violation Not Found</h2>
@@ -315,7 +315,7 @@ export default function PayViolationPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
-            <ShieldAlert className="h-4 w-4 shrink-0 text-destructive" />
+            <ShieldAlert className="h-4 w-4 shrink-0 text-primary" />
             <span className="truncate text-sm font-medium">Traffic Violation Fine</span>
           </div>
           <div className="ml-auto">
@@ -353,13 +353,13 @@ export default function PayViolationPage() {
                 </p>
                 <p className="text-4xl font-bold tracking-tight">
                   RWF{" "}
-                  <span className="text-destructive">
+                  <span className="text-primary">
                     {violation.fineAmount.toLocaleString()}
                   </span>
                 </p>
               </div>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-destructive/10">
-                <Banknote className="h-6 w-6 text-destructive" />
+                <Banknote className="h-6 w-6 text-primary" />
               </div>
             </div>
           </div>
@@ -376,7 +376,7 @@ export default function PayViolationPage() {
                 label="Speed Recorded"
                 value={
                   <span>
-                    <span className="text-destructive font-semibold">{violation.speed} km/h</span>
+                    <span className="text-primary font-semibold">{violation.speed} km/h</span>
                     {" "}in a {violation.speedLimit} km/h zone
                     {" "}
                     <span className="text-xs text-muted-foreground">
@@ -439,7 +439,7 @@ export default function PayViolationPage() {
 
               <div className="flex justify-between text-sm font-semibold">
                 <span>Total Due</span>
-                <span className="text-destructive text-base">
+                <span className="text-primary text-base">
                   RWF {violation.fineAmount.toLocaleString()}
                 </span>
               </div>

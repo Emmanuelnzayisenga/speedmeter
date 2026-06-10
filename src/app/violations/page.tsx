@@ -118,7 +118,6 @@ export default function ViolationsPage() {
     <AppLayout>
       <div className="w-full flex flex-col gap-4 animate-fade-up mx-2">
 
-        {/* Header */}
         <div>
           <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wider">VIOLATIONS & FINES</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -126,7 +125,6 @@ export default function ViolationsPage() {
           </p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { label: 'Total Violations', value: pagination.total, icon: AlertTriangle, color: 'text-sw-danger' },
@@ -144,7 +142,6 @@ export default function ViolationsPage() {
           ))}
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -166,10 +163,8 @@ export default function ViolationsPage() {
           </Button>
         </div>
 
-        {/* Card-grid list */}
-        <div className="rounded-lg border border-border bg-card overflow-hidden panel-glow">
-
-          {/* Column headers — hidden on mobile */}
+        {/* Desktop grid list */}
+        <div className="hidden sm:block rounded-lg border border-border bg-card overflow-hidden panel-glow">
           <div className="hidden sm:grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] gap-x-4 items-center px-4 py-2.5 bg-muted/30 border-b border-border">
             <span className="text-[10px] tracking-wider text-muted-foreground font-medium uppercase">Vehicle</span>
             <span className="text-[10px] tracking-wider text-muted-foreground font-medium uppercase">Zone</span>
@@ -182,7 +177,7 @@ export default function ViolationsPage() {
           <div className="divide-y divide-border">
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_1fr_auto_auto_auto_auto] gap-x-4 items-center px-4 py-3">
+                <div key={i} className="grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] gap-x-4 items-center px-4 py-3">
                   {Array.from({ length: 6 }).map((_, j) => (
                     <div key={j} className="h-4 rounded shimmer" />
                   ))}
@@ -196,108 +191,54 @@ export default function ViolationsPage() {
             ) : violations.map(v => {
               const StatusIcon = STATUS_ICONS[v.status] || Clock
               const isActionable = v.status === 'PENDING' || v.status === 'CONFIRMED'
-
               return (
-                <div
-                  key={v.id}
-                  className="group hover:bg-muted/20 transition-colors px-4 py-3 flex flex-col sm:grid sm:grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] sm:gap-x-4 sm:items-center gap-y-0"
-                >
-                  {/* ── Mobile: 2-col label/value grid; Desktop: individual cells ── */}
-
-                  {/* Vehicle */}
-                  <div className="flex items-center gap-2 min-w-0 py-1.5 sm:py-0">
-                    {/* Mobile label */}
-                    <span className="sm:hidden text-[10px] text-muted-foreground uppercase tracking-wider w-16 flex-shrink-0">Vehicle</span>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-base flex-shrink-0">{VEHICLE_TYPE_ICONS[v.vehicle?.type]}</span>
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium truncate">{v.vehicle?.name}</p>
-                        <p className="text-[10px] font-mono text-muted-foreground">{v.vehicle?.plateNumber}</p>
-                      </div>
+                <div key={v.id} className="group hover:bg-muted/20 transition-colors px-4 py-3 grid grid-cols-[2fr_2fr_1fr_1fr_1fr_auto] gap-x-4 items-center">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-base flex-shrink-0">{VEHICLE_TYPE_ICONS[v.vehicle?.type]}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium truncate">{v.vehicle?.name}</p>
+                      <p className="text-[10px] font-mono text-muted-foreground">{v.vehicle?.plateNumber}</p>
                     </div>
                   </div>
-
-                  {/* Zone */}
-                  <div className="flex items-center gap-2 min-w-0 py-1.5 sm:py-0 sm:gap-1.5">
-                    <span className="sm:hidden text-[10px] text-muted-foreground uppercase tracking-wider w-16 flex-shrink-0">Zone</span>
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                      <span className="text-xs truncate">{v.zone?.name || 'Unknown zone'}</span>
-                    </div>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                    <span className="text-xs truncate">{v.zone?.name || 'Unknown zone'}</span>
                   </div>
-
-                  {/* Speed */}
-                  <div className="flex items-center gap-2 py-1.5 sm:py-0 sm:block sm:text-center">
-                    <span className="sm:hidden text-[10px] text-muted-foreground uppercase tracking-wider w-16 flex-shrink-0">Speed</span>
-                    <div>
-                      <div className="flex items-center gap-1 sm:justify-center">
-                        <Gauge className="w-3 h-3 text-sw-danger flex-shrink-0" />
-                        <span className="text-xs font-mono font-bold text-sw-danger">{Math.round(v.speed)} km/h</span>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground sm:text-center">+{Math.round(v.excessSpeed)} over</p>
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 justify-center">
+                      <Gauge className="w-3 h-3 text-sw-danger flex-shrink-0" />
+                      <span className="text-xs font-mono font-bold text-sw-danger">{Math.round(v.speed)} km/h</span>
                     </div>
+                    <p className="text-[10px] text-muted-foreground">+{Math.round(v.excessSpeed)} over</p>
                   </div>
-
-                  {/* Fine */}
-                  <div className="flex items-center gap-2 py-1.5 sm:py-0 sm:block sm:text-center">
-                    <span className="sm:hidden text-[10px] text-muted-foreground uppercase tracking-wider w-16 flex-shrink-0">Fine</span>
-                    <span className={cn(
-                      "text-xs font-mono font-bold",
-                      v.fineAmount > 0 ? "text-sw-warn" : "text-muted-foreground"
-                    )}>
+                  <div className="text-center">
+                    <span className={cn("text-xs font-mono font-bold", v.fineAmount > 0 ? "text-sw-warn" : "text-muted-foreground")}>
                       {v.fineAmount > 0 ? formatCurrency(v.fineAmount) : '—'}
                     </span>
                   </div>
-
-                  {/* Status */}
-                  <div className="flex items-center gap-2 py-1.5 sm:py-0 sm:justify-center">
-                    <span className="sm:hidden text-[10px] text-muted-foreground uppercase tracking-wider w-16 flex-shrink-0">Status</span>
+                  <div className="flex justify-center">
                     <Badge variant={STATUS_BADGE[v.status] || 'default'} className="text-[10px] gap-1">
                       <StatusIcon className="w-2.5 h-2.5" />
                       {v.status}
                     </Badge>
                   </div>
-
-                  {/* Actions — always visible, never overflow */}
-                  <div className="flex items-center gap-1 pt-2.5 pb-0.5 border-t border-border/50 sm:border-none sm:pt-0 sm:pb-0 sm:justify-end flex-shrink-0">
-                    <Button
-                      variant="ghost" size="icon" className="h-7 w-7"
-                      title="View details"
-                      onClick={() => setDetailViolation(v)}
-                    >
+                  <div className="flex items-center gap-1 justify-end flex-shrink-0">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDetailViolation(v)}>
                       <Eye className="h-3.5 w-3.5" />
                     </Button>
-                    <Button
-                      variant="ghost" size="icon" className="h-7 w-7"
-                      title="Edit"
-                      onClick={() => openEdit(v)}
-                    >
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(v)}>
                       <Edit className="h-3.5 w-3.5" />
                     </Button>
                     {isActionable && (
-                      <Button
-                        variant="ghost" size="icon"
-                        className="h-7 w-7 text-green-500 hover:text-green-400 hover:bg-green-500/10"
-                        title="Quick resolve"
-                        onClick={() => quickResolve(v.id)}
-                      >
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-green-500 hover:text-green-400 hover:bg-green-500/10" onClick={() => quickResolve(v.id)}>
                         <CheckCircle className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                    <Button
-                      variant="ghost" size="icon"
-                      className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                      title="Delete"
-                      onClick={() => setDeleteId(v.id)}
-                    >
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(v.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                     {isActionable && (
-                      <Button
-                        asChild size="sm"
-                        className="h-7 px-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium gap-1"
-                        title="Pay fine"
-                      >
+                      <Button asChild size="sm" className="h-7 px-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium gap-1">
                         <Link href={`/payments/${v.id}`}>
                           <Wallet className="h-3.5 w-3.5" />
                           <span className="hidden lg:inline">Pay</span>
@@ -311,7 +252,100 @@ export default function ViolationsPage() {
           </div>
         </div>
 
-        {/* Pagination */}
+        {/* Mobile card grid */}
+        <div className="sm:hidden space-y-3">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <div className="h-5 rounded shimmer w-1/2" />
+                <div className="grid grid-cols-2 gap-2">
+                  {Array.from({ length: 6 }).map((_, j) => (
+                    <div key={j} className="h-4 rounded shimmer" />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : violations.length === 0 ? (
+            <div className="rounded-lg border border-border bg-card py-12 flex flex-col items-center gap-2 text-muted-foreground">
+              <AlertTriangle className="w-10 h-10 opacity-20" />
+              <p className="text-sm">No violations found</p>
+            </div>
+          ) : violations.map(v => {
+            const StatusIcon = STATUS_ICONS[v.status] || Clock
+            const isActionable = v.status === 'PENDING' || v.status === 'CONFIRMED'
+            return (
+              <div key={v.id} className="rounded-lg border border-border bg-card overflow-hidden panel-glow">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base flex-shrink-0">{VEHICLE_TYPE_ICONS[v.vehicle?.type]}</span>
+                    <div>
+                      <p className="text-sm font-medium leading-tight">{v.vehicle?.name}</p>
+                      <p className="text-[10px] font-mono text-muted-foreground">{v.vehicle?.plateNumber}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDetailViolation(v)}>
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(v)}>
+                      <Edit className="h-3.5 w-3.5" />
+                    </Button>
+                    {isActionable && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-green-500 hover:text-green-400 hover:bg-green-500/10" onClick={() => quickResolve(v.id)}>
+                        <CheckCircle className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(v.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                    {isActionable && (
+                      <Button asChild size="sm" className="h-7 px-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium gap-1">
+                        <Link href={`/payments/${v.id}`}>
+                          <Wallet className="h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Zone</p>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                      <span className="text-xs truncate">{v.zone?.name || 'Unknown zone'}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Status</p>
+                    <Badge variant={STATUS_BADGE[v.status] || 'default'} className="text-[10px] gap-1">
+                      <StatusIcon className="w-2.5 h-2.5" />
+                      {v.status}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Speed</p>
+                    <div className="flex items-center gap-1.5">
+                      <Gauge className="w-3 h-3 text-sw-danger flex-shrink-0" />
+                      <span className="text-xs font-mono font-bold text-sw-danger">{Math.round(v.speed)} km/h</span>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">+{Math.round(v.excessSpeed)} over limit</p>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Fine</p>
+                    <span className={cn("text-xs font-mono font-bold", v.fineAmount > 0 ? "text-sw-warn" : "text-muted-foreground")}>
+                      {v.fineAmount > 0 ? formatCurrency(v.fineAmount) : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
         {pagination.totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
@@ -332,7 +366,6 @@ export default function ViolationsPage() {
         )}
       </div>
 
-      {/* Detail Dialog */}
       <Dialog open={!!detailViolation} onOpenChange={() => setDetailViolation(null)}>
         <DialogContent className="max-w-md w-[calc(100vw-2rem)]">
           <DialogHeader>
@@ -370,7 +403,6 @@ export default function ViolationsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog open={!!editViolation} onOpenChange={() => setEditViolation(null)}>
         <DialogContent className="max-w-md w-[calc(100vw-2rem)]">
           <DialogHeader>
@@ -406,7 +438,6 @@ export default function ViolationsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Dialog */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm w-[calc(100vw-2rem)]">
           <DialogHeader>

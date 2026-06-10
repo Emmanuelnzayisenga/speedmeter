@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
@@ -15,6 +14,8 @@ import {
   Plus, Search, Edit, Trash2, Car, ChevronLeft, ChevronRight,
   RefreshCw, AlertTriangle, Gauge, User, Cpu, Filter
 } from 'lucide-react'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 const VEHICLE_TYPES = ['CAR', 'TRUCK', 'MOTORCYCLE', 'BUS', 'VAN', 'OTHER']
 const VEHICLE_STATUSES = ['ACTIVE', 'INACTIVE', 'MOVING', 'SPEEDING', 'OFFLINE']
@@ -26,6 +27,38 @@ const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4'
 const emptyForm = {
   name: '', plateNumber: '', type: 'CAR', status: 'INACTIVE',
   driverName: '', driverPhone: '', deviceId: '', color: '#3B82F6'
+}
+
+function ScrollButtonGroup<T extends string>({
+  options,
+  value,
+  onChange,
+  renderLabel,
+}: {
+  options: T[]
+  value: T
+  onChange: (v: T) => void
+  renderLabel?: (v: T) => React.ReactNode
+}) {
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      {options.map(opt => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => onChange(opt)}
+          className={cn(
+            "flex-shrink-0 px-3 py-4 rounded-md border text-xs font-medium tracking-wide transition-all whitespace-nowrap",
+            value === opt
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+          )}
+        >
+          {renderLabel ? renderLabel(opt) : opt}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export default function VehiclesPage() {
@@ -62,9 +95,11 @@ export default function VehiclesPage() {
   const openCreate = () => { setEditingVehicle(null); setForm(emptyForm); setDialogOpen(true) }
   const openEdit = (v: any) => {
     setEditingVehicle(v)
-    setForm({ name: v.name, plateNumber: v.plateNumber, type: v.type, status: v.status,
+    setForm({
+      name: v.name, plateNumber: v.plateNumber, type: v.type, status: v.status,
       driverName: v.driverName || '', driverPhone: v.driverPhone || '',
-      deviceId: v.deviceId || '', color: v.color || '#3B82F6' })
+      deviceId: v.deviceId || '', color: v.color || '#3B82F6'
+    })
     setDialogOpen(true)
   }
 
@@ -128,22 +163,29 @@ export default function VehiclesPage() {
               className="pl-9 bg-card"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-44 bg-card">
-              <Filter className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {VEHICLE_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
+            <Filter className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+            {['', ...VEHICLE_STATUSES].map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatusFilter(s)}
+                className={cn(
+                  "flex-shrink-0 px-3 py-1.5 rounded-md border text-xs font-medium tracking-wide transition-all whitespace-nowrap",
+                  statusFilter === s
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
+                )}
+              >
+                {s === '' ? 'All' : s}
+              </button>
+            ))}
+          </div>
           <Button variant="outline" size="icon" onClick={() => fetchVehicles(pagination.page)} className="flex-shrink-0">
             <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
           </Button>
         </div>
 
-        {/* Desktop table */}
         <div className="hidden md:block rounded-lg border border-border bg-card overflow-hidden panel-glow">
           <Table>
             <TableHeader>
@@ -252,13 +294,12 @@ export default function VehiclesPage() {
           </Table>
         </div>
 
-        {/* Mobile card grid */}
         <div className="md:hidden space-y-3">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-lg border border-border bg-card p-4 space-y-3">
                 <div className="h-5 rounded shimmer w-1/2" />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-2">
                   {Array.from({ length: 6 }).map((_, j) => (
                     <div key={j} className="h-4 rounded shimmer" />
                   ))}
@@ -297,19 +338,17 @@ export default function VehiclesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3">
+              <div className="flex flex-col gap-x-4 gap-y-3 px-4 py-3">
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Plate</p>
                   <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded inline-block">{v.plateNumber}</span>
                 </div>
-
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Status</p>
                   <Badge variant={STATUS_BADGE[v.status] || 'default'} className="text-[10px]">
                     {v.status}
                   </Badge>
                 </div>
-
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Driver</p>
                   {v.driverName ? (
@@ -319,7 +358,6 @@ export default function VehiclesPage() {
                     </div>
                   ) : <span className="text-xs text-muted-foreground">—</span>}
                 </div>
-
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Device</p>
                   {v.deviceId ? (
@@ -329,7 +367,6 @@ export default function VehiclesPage() {
                     </div>
                   ) : <span className="text-xs text-muted-foreground">Not assigned</span>}
                 </div>
-
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Last Speed</p>
                   {v.locations?.[0] ? (
@@ -341,7 +378,6 @@ export default function VehiclesPage() {
                     </div>
                   ) : <span className="text-xs text-muted-foreground">—</span>}
                 </div>
-
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">Violations</p>
                   {v._count?.violations > 0 ? (
@@ -384,8 +420,8 @@ export default function VehiclesPage() {
               {editingVehicle ? 'Update vehicle information' : 'Register a new vehicle in the fleet'}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="col-span-2 space-y-1.5">
+          <div className="flex flex-col gap-4 py-2">
+            <div className="space-y-1.5">
               <Label>Vehicle Name *</Label>
               <Input placeholder="e.g. Fleet Truck Alpha" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
             </div>
@@ -396,17 +432,20 @@ export default function VehiclesPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Type</Label>
-              <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{VEHICLE_TYPES.map(t => <SelectItem key={t} value={t}>{VEHICLE_TYPE_ICONS[t]} {t}</SelectItem>)}</SelectContent>
-              </Select>
+              <ScrollButtonGroup
+                options={VEHICLE_TYPES as any}
+                value={form.type}
+                onChange={v => setForm(f => ({ ...f, type: v }))}
+                renderLabel={t => <span>{VEHICLE_TYPE_ICONS[t]} {t}</span>}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Status</Label>
-              <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{VEHICLE_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
+              <ScrollButtonGroup
+                options={VEHICLE_STATUSES as any}
+                value={form.status}
+                onChange={v => setForm(f => ({ ...f, status: v }))}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Color</Label>
@@ -426,7 +465,19 @@ export default function VehiclesPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Driver Phone</Label>
-              <Input placeholder="+254712345678" value={form.driverPhone} onChange={e => setForm(f => ({ ...f, driverPhone: e.target.value }))} />
+              <PhoneInput
+                containerStyle={{ width: "100%" }}
+                inputStyle={{ color: "black", width: "100%" }}
+                enableTerritories
+                enableSearch
+                enableAreaCodes
+                countryCodeEditable={false}
+                enableLongNumbers
+                inputProps={{ name: 'phone', required: true, autoFocus: true }}
+                country={'rw'}
+                value={form.driverPhone}
+                onChange={(phone) => setForm({ ...form, driverPhone: phone })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>GPS Device ID</Label>

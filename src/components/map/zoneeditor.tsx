@@ -16,6 +16,7 @@ interface ZoneEditorMapProps {
     drawMode: 'CIRCLE' | 'POLYGON' | 'ROAD' | null
     onZoneDrawn: (coords: any, type: string) => void
     onZoneClick?: (id: string) => void
+     selectedZoneId?: string | null
     className?: string
 }
 
@@ -48,7 +49,7 @@ function parseCoordString(raw: string): { lat: number; lng: number } | null {
     return null
 }
 
-export function ZoneEditorMap({ zones, drawMode, onZoneDrawn, onZoneClick, className }: ZoneEditorMapProps) {
+export function ZoneEditorMap({ zones, drawMode, onZoneDrawn, onZoneClick, className , selectedZoneId }: ZoneEditorMapProps) {
     const mapRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<any>(null)
     const LRef = useRef<any>(null)
@@ -177,6 +178,26 @@ export function ZoneEditorMap({ zones, drawMode, onZoneDrawn, onZoneClick, class
     }, [syncHistoryState])
 
     useEffect(() => { if (!drawMode) resetHistory() }, [drawMode, resetHistory])
+        // ── Fly to selected zone ──────────────────────────────────────────────────────
+useEffect(() => {
+    if (!isLoaded || !selectedZoneId || !mapInstanceRef.current) return
+    const map = mapInstanceRef.current
+    const zone = zones.find(z => z.id === selectedZoneId)
+    if (!zone) return
+
+    if (zone.zoneType === 'CIRCLE' && zone.coordinates?.lat) {
+        map.flyTo([zone.coordinates.lat, zone.coordinates.lng], 15, { duration: 1.0 })
+    } else if (zone.zoneType === 'POLYGON' && Array.isArray(zone.coordinates)) {
+        const lats = zone.coordinates.map((c: any) => c.lat)
+        const lngs = zone.coordinates.map((c: any) => c.lng)
+        const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2
+        const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2
+        map.flyTo([centerLat, centerLng], 15, { duration: 1.0 })
+    } else if (zone.zoneType === 'ROAD' && Array.isArray(zone.coordinates)) {
+        const mid = zone.coordinates[Math.floor(zone.coordinates.length / 2)]
+        map.flyTo([mid.lat, mid.lng], 16, { duration: 1.0 })
+    }
+}, [isLoaded, selectedZoneId, zones])
 
     // ── Map init ──────────────────────────────────────────────────────────────
     useEffect(() => {

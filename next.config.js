@@ -7,6 +7,18 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config, { isServer }) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: [
+        '**/node_modules/**',
+        '**/.git/**',
+        'C:/Users/*/Application Data/**',
+        'C:/Users/*/AppData/**',
+      ],
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig
