@@ -117,7 +117,7 @@ function calculateFine(excessSpeed: number): number {
   return 50000
 }
 
-// ─── Helper: safely coerce to float ─────────────────────────────────────────
+// ─── Coercion helpers ────────────────────────────────────────────────────────
 
 function toFloat(value: unknown): number {
   if (typeof value === 'number') return value
@@ -134,16 +134,16 @@ function toInt(value: unknown): number | null {
 
 // ─── POST /api/gps/ingest ────────────────────────────────────────────────────
 
+const SMS_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes per vehicle+zone
+
 export async function POST(req: NextRequest) {
   try {
-    // 1. Guard against empty / non-JSON bodies
     const text = await req.text()
     if (!text?.trim()) {
       console.warn('[ingest] Empty request body')
       return NextResponse.json({ error: 'Empty request body' }, { status: 400 })
     }
 
-    // 2. Parse JSON safely
     let body: any
     try {
       body = JSON.parse(text)
@@ -164,12 +164,11 @@ export async function POST(req: NextRequest) {
       timestamp,
     } = body
 
-    // 3. Validate required fields exist
     if (
       !deviceId ||
-      latitude === undefined ||
+      latitude  === undefined ||
       longitude === undefined ||
-      speed === undefined
+      speed     === undefined
     ) {
       return NextResponse.json(
         { error: 'deviceId, latitude, longitude, speed are required' },
@@ -177,7 +176,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 4. Coerce and validate numeric types
     const lat = toFloat(latitude)
     const lng = toFloat(longitude)
     const spd = toFloat(speed)
@@ -189,13 +187,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 5. Skip frames that have no real GPS fix (0,0 is the null-island default)
     if (lat === 0 && lng === 0) {
       console.warn(`[ingest] Skipping null-island frame for device ${deviceId}`)
       return NextResponse.json({ skipped: true, reason: 'No GPS fix' })
     }
 
-    // 6. Look up vehicle
     const vehicle = await prisma.vehicle.findUnique({ where: { deviceId } })
     if (!vehicle) {
       return NextResponse.json(
@@ -204,23 +200,20 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 7. Store location
     const location = await prisma.vehicleLocation.create({
       data: {
-        vehicleId: vehicle.id,
-        latitude:  lat,
-        longitude: lng,
-        speed:     spd,
-        heading:   toFloat(heading)  || null,
-        altitude:  toFloat(altitude) || null,
-        accuracy:  toFloat(accuracy) || null,
+        vehicleId:  vehicle.id,
+        latitude:   lat,
+        longitude:  lng,
+        speed:      spd,
+        heading:    toFloat(heading)  || null,
+        altitude:   toFloat(altitude) || null,
+        accuracy:   toFloat(accuracy) || null,
         satellites: toInt(satellites),
-        // FIX: actually use the device timestamp when provided
-        timestamp: timestamp ? new Date(timestamp) : new Date(),
+        timestamp:  timestamp ? new Date(timestamp) : new Date(),
       },
     })
 
-    // 8. Determine vehicle status and check speed zones
     let newStatus = spd > 0 ? 'MOVING' : 'ACTIVE'
     const activeZones = await prisma.speedZone.findMany({ where: { active: true } })
     let violation = null
@@ -246,26 +239,38 @@ export async function POST(req: NextRequest) {
           },
         })
 
-        // Send SMS alert (fire-and-forget — don't let SMS failure break the response)
-        sendSms({
-          to: vehicle.driverPhone || '',
-          message:
-            `On ${violation.timestamp.toLocaleString()}, your vehicle ` +
-            `${vehicle.plateNumber} was recorded speeding at ${violation.speed} km/h ` +
-            `in zone "${zone.name}" (limit: ${zone.speedLimit} km/h).\n\n` +
-            `Fine: RWF ${fineAmount}.\n\n` +
-            `💳 Pay now: ${process.env.NEXTAUTH_URL}/payments/${violation.id}\n` +
-            `🔍 View fines: ${process.env.NEXTAUTH_URL}/fines?plate=${vehicle.plateNumber}\n\n` +
-            `Please drive safely!`,
-        }).catch(smsErr => {
-          console.error('[ingest] SMS send failed:', smsErr)
+        // Only send SMS if no violation was recorded for this vehicle+zone
+        // within the cooldown window — violations are still always recorded
+        const recentViolation = await prisma.violation.findFirst({
+          where: {
+            vehicleId: vehicle.id,
+            zoneId:    zone.id,
+            id:        { not: violation.id },
+            timestamp: { gte: new Date(Date.now() - SMS_COOLDOWN_MS) },
+          },
+          orderBy: { timestamp: 'desc' },
         })
+
+        if (!recentViolation) {
+          sendSms({
+            to: vehicle.driverPhone || '',
+            message:
+              `On ${violation.timestamp.toLocaleString()}, your vehicle ` +
+              `${vehicle.plateNumber} was recorded speeding at ${violation.speed} km/h ` +
+              `in zone "${zone.name}" (limit: ${zone.speedLimit} km/h).\n\n` +
+              `Fine: RWF ${fineAmount}.\n\n` +
+              `💳 Pay now: ${process.env.NEXTAUTH_URL}/payments/${violation.id}\n` +
+              `🔍 View fines: ${process.env.NEXTAUTH_URL}/fines?plate=${vehicle.plateNumber}\n\n` +
+              `Please drive safely!`,
+          }).catch(smsErr => {
+            console.error('[ingest] SMS send failed:', smsErr)
+          })
+        }
 
         break // one violation per frame is enough
       }
     }
 
-    // 9. Update vehicle status
     await prisma.vehicle.update({
       where: { id: vehicle.id },
       data:  { status: newStatus as any },
@@ -325,7 +330,6 @@ export async function PUT(req: NextRequest) {
             longitude: toFloat(reading.longitude),
             speed:     toFloat(reading.speed),
             heading:   reading.heading ? toFloat(reading.heading) : null,
-            // FIX: use provided timestamp
             timestamp: reading.timestamp ? new Date(reading.timestamp) : new Date(),
           },
         })

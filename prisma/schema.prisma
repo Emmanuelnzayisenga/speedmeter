@@ -62,6 +62,18 @@ model VehicleLocation {
   @@index([vehicleId, timestamp])
 }
 
+
+model pLocation {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  latitude    Float
+  longitude   Float
+  speed       Float    @default(0)
+  
+
+  @@index([vehicleId])
+}
+
 model SpeedZone {
   id           String   @id @default(cuid())
   name         String

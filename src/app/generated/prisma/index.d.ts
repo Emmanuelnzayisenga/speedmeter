@@ -29,6 +29,11 @@ export type Vehicle = $Result.DefaultSelection<Prisma.$VehiclePayload>
  */
 export type VehicleLocation = $Result.DefaultSelection<Prisma.$VehicleLocationPayload>
 /**
+ * Model pLocation
+ * 
+ */
+export type pLocation = $Result.DefaultSelection<Prisma.$pLocationPayload>
+/**
  * Model SpeedZone
  * 
  */
@@ -251,6 +256,16 @@ export class PrismaClient<
     * ```
     */
   get vehicleLocation(): Prisma.VehicleLocationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.pLocation`: Exposes CRUD operations for the **pLocation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PLocations
+    * const pLocations = await prisma.pLocation.findMany()
+    * ```
+    */
+  get pLocation(): Prisma.pLocationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.speedZone`: Exposes CRUD operations for the **SpeedZone** model.
@@ -715,6 +730,7 @@ export namespace Prisma {
     User: 'User',
     Vehicle: 'Vehicle',
     VehicleLocation: 'VehicleLocation',
+    pLocation: 'pLocation',
     SpeedZone: 'SpeedZone',
     Violation: 'Violation'
   };
@@ -735,7 +751,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "vehicle" | "vehicleLocation" | "speedZone" | "violation"
+      modelProps: "user" | "vehicle" | "vehicleLocation" | "pLocation" | "speedZone" | "violation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -958,6 +974,80 @@ export namespace Prisma {
           count: {
             args: Prisma.VehicleLocationCountArgs<ExtArgs>
             result: $Utils.Optional<VehicleLocationCountAggregateOutputType> | number
+          }
+        }
+      }
+      pLocation: {
+        payload: Prisma.$pLocationPayload<ExtArgs>
+        fields: Prisma.pLocationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.pLocationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.pLocationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          findFirst: {
+            args: Prisma.pLocationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.pLocationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          findMany: {
+            args: Prisma.pLocationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>[]
+          }
+          create: {
+            args: Prisma.pLocationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          createMany: {
+            args: Prisma.pLocationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.pLocationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>[]
+          }
+          delete: {
+            args: Prisma.pLocationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          update: {
+            args: Prisma.pLocationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          deleteMany: {
+            args: Prisma.pLocationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.pLocationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.pLocationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>[]
+          }
+          upsert: {
+            args: Prisma.pLocationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pLocationPayload>
+          }
+          aggregate: {
+            args: Prisma.PLocationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePLocation>
+          }
+          groupBy: {
+            args: Prisma.pLocationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PLocationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.pLocationCountArgs<ExtArgs>
+            result: $Utils.Optional<PLocationCountAggregateOutputType> | number
           }
         }
       }
@@ -1208,6 +1298,7 @@ export namespace Prisma {
     user?: UserOmit
     vehicle?: VehicleOmit
     vehicleLocation?: VehicleLocationOmit
+    pLocation?: pLocationOmit
     speedZone?: SpeedZoneOmit
     violation?: ViolationOmit
   }
@@ -4765,6 +4856,1043 @@ export namespace Prisma {
 
 
   /**
+   * Model pLocation
+   */
+
+  export type AggregatePLocation = {
+    _count: PLocationCountAggregateOutputType | null
+    _avg: PLocationAvgAggregateOutputType | null
+    _sum: PLocationSumAggregateOutputType | null
+    _min: PLocationMinAggregateOutputType | null
+    _max: PLocationMaxAggregateOutputType | null
+  }
+
+  export type PLocationAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    speed: number | null
+  }
+
+  export type PLocationSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    speed: number | null
+  }
+
+  export type PLocationMinAggregateOutputType = {
+    id: string | null
+    vehicleId: string | null
+    latitude: number | null
+    longitude: number | null
+    speed: number | null
+  }
+
+  export type PLocationMaxAggregateOutputType = {
+    id: string | null
+    vehicleId: string | null
+    latitude: number | null
+    longitude: number | null
+    speed: number | null
+  }
+
+  export type PLocationCountAggregateOutputType = {
+    id: number
+    vehicleId: number
+    latitude: number
+    longitude: number
+    speed: number
+    _all: number
+  }
+
+
+  export type PLocationAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    speed?: true
+  }
+
+  export type PLocationSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    speed?: true
+  }
+
+  export type PLocationMinAggregateInputType = {
+    id?: true
+    vehicleId?: true
+    latitude?: true
+    longitude?: true
+    speed?: true
+  }
+
+  export type PLocationMaxAggregateInputType = {
+    id?: true
+    vehicleId?: true
+    latitude?: true
+    longitude?: true
+    speed?: true
+  }
+
+  export type PLocationCountAggregateInputType = {
+    id?: true
+    vehicleId?: true
+    latitude?: true
+    longitude?: true
+    speed?: true
+    _all?: true
+  }
+
+  export type PLocationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which pLocation to aggregate.
+     */
+    where?: pLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pLocations to fetch.
+     */
+    orderBy?: pLocationOrderByWithRelationInput | pLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: pLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned pLocations
+    **/
+    _count?: true | PLocationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PLocationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PLocationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PLocationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PLocationMaxAggregateInputType
+  }
+
+  export type GetPLocationAggregateType<T extends PLocationAggregateArgs> = {
+        [P in keyof T & keyof AggregatePLocation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePLocation[P]>
+      : GetScalarType<T[P], AggregatePLocation[P]>
+  }
+
+
+
+
+  export type pLocationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: pLocationWhereInput
+    orderBy?: pLocationOrderByWithAggregationInput | pLocationOrderByWithAggregationInput[]
+    by: PLocationScalarFieldEnum[] | PLocationScalarFieldEnum
+    having?: pLocationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PLocationCountAggregateInputType | true
+    _avg?: PLocationAvgAggregateInputType
+    _sum?: PLocationSumAggregateInputType
+    _min?: PLocationMinAggregateInputType
+    _max?: PLocationMaxAggregateInputType
+  }
+
+  export type PLocationGroupByOutputType = {
+    id: string
+    vehicleId: string
+    latitude: number
+    longitude: number
+    speed: number
+    _count: PLocationCountAggregateOutputType | null
+    _avg: PLocationAvgAggregateOutputType | null
+    _sum: PLocationSumAggregateOutputType | null
+    _min: PLocationMinAggregateOutputType | null
+    _max: PLocationMaxAggregateOutputType | null
+  }
+
+  type GetPLocationGroupByPayload<T extends pLocationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PLocationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PLocationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PLocationGroupByOutputType[P]>
+            : GetScalarType<T[P], PLocationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type pLocationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    vehicleId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    speed?: boolean
+  }, ExtArgs["result"]["pLocation"]>
+
+  export type pLocationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    vehicleId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    speed?: boolean
+  }, ExtArgs["result"]["pLocation"]>
+
+  export type pLocationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    vehicleId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    speed?: boolean
+  }, ExtArgs["result"]["pLocation"]>
+
+  export type pLocationSelectScalar = {
+    id?: boolean
+    vehicleId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    speed?: boolean
+  }
+
+  export type pLocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "vehicleId" | "latitude" | "longitude" | "speed", ExtArgs["result"]["pLocation"]>
+
+  export type $pLocationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "pLocation"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      vehicleId: string
+      latitude: number
+      longitude: number
+      speed: number
+    }, ExtArgs["result"]["pLocation"]>
+    composites: {}
+  }
+
+  type pLocationGetPayload<S extends boolean | null | undefined | pLocationDefaultArgs> = $Result.GetResult<Prisma.$pLocationPayload, S>
+
+  type pLocationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<pLocationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PLocationCountAggregateInputType | true
+    }
+
+  export interface pLocationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['pLocation'], meta: { name: 'pLocation' } }
+    /**
+     * Find zero or one PLocation that matches the filter.
+     * @param {pLocationFindUniqueArgs} args - Arguments to find a PLocation
+     * @example
+     * // Get one PLocation
+     * const pLocation = await prisma.pLocation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends pLocationFindUniqueArgs>(args: SelectSubset<T, pLocationFindUniqueArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PLocation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {pLocationFindUniqueOrThrowArgs} args - Arguments to find a PLocation
+     * @example
+     * // Get one PLocation
+     * const pLocation = await prisma.pLocation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends pLocationFindUniqueOrThrowArgs>(args: SelectSubset<T, pLocationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PLocation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationFindFirstArgs} args - Arguments to find a PLocation
+     * @example
+     * // Get one PLocation
+     * const pLocation = await prisma.pLocation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends pLocationFindFirstArgs>(args?: SelectSubset<T, pLocationFindFirstArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PLocation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationFindFirstOrThrowArgs} args - Arguments to find a PLocation
+     * @example
+     * // Get one PLocation
+     * const pLocation = await prisma.pLocation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends pLocationFindFirstOrThrowArgs>(args?: SelectSubset<T, pLocationFindFirstOrThrowArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PLocations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PLocations
+     * const pLocations = await prisma.pLocation.findMany()
+     * 
+     * // Get first 10 PLocations
+     * const pLocations = await prisma.pLocation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const pLocationWithIdOnly = await prisma.pLocation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends pLocationFindManyArgs>(args?: SelectSubset<T, pLocationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PLocation.
+     * @param {pLocationCreateArgs} args - Arguments to create a PLocation.
+     * @example
+     * // Create one PLocation
+     * const PLocation = await prisma.pLocation.create({
+     *   data: {
+     *     // ... data to create a PLocation
+     *   }
+     * })
+     * 
+     */
+    create<T extends pLocationCreateArgs>(args: SelectSubset<T, pLocationCreateArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PLocations.
+     * @param {pLocationCreateManyArgs} args - Arguments to create many PLocations.
+     * @example
+     * // Create many PLocations
+     * const pLocation = await prisma.pLocation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends pLocationCreateManyArgs>(args?: SelectSubset<T, pLocationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PLocations and returns the data saved in the database.
+     * @param {pLocationCreateManyAndReturnArgs} args - Arguments to create many PLocations.
+     * @example
+     * // Create many PLocations
+     * const pLocation = await prisma.pLocation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PLocations and only return the `id`
+     * const pLocationWithIdOnly = await prisma.pLocation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends pLocationCreateManyAndReturnArgs>(args?: SelectSubset<T, pLocationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PLocation.
+     * @param {pLocationDeleteArgs} args - Arguments to delete one PLocation.
+     * @example
+     * // Delete one PLocation
+     * const PLocation = await prisma.pLocation.delete({
+     *   where: {
+     *     // ... filter to delete one PLocation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends pLocationDeleteArgs>(args: SelectSubset<T, pLocationDeleteArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PLocation.
+     * @param {pLocationUpdateArgs} args - Arguments to update one PLocation.
+     * @example
+     * // Update one PLocation
+     * const pLocation = await prisma.pLocation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends pLocationUpdateArgs>(args: SelectSubset<T, pLocationUpdateArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PLocations.
+     * @param {pLocationDeleteManyArgs} args - Arguments to filter PLocations to delete.
+     * @example
+     * // Delete a few PLocations
+     * const { count } = await prisma.pLocation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends pLocationDeleteManyArgs>(args?: SelectSubset<T, pLocationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PLocations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PLocations
+     * const pLocation = await prisma.pLocation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends pLocationUpdateManyArgs>(args: SelectSubset<T, pLocationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PLocations and returns the data updated in the database.
+     * @param {pLocationUpdateManyAndReturnArgs} args - Arguments to update many PLocations.
+     * @example
+     * // Update many PLocations
+     * const pLocation = await prisma.pLocation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PLocations and only return the `id`
+     * const pLocationWithIdOnly = await prisma.pLocation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends pLocationUpdateManyAndReturnArgs>(args: SelectSubset<T, pLocationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PLocation.
+     * @param {pLocationUpsertArgs} args - Arguments to update or create a PLocation.
+     * @example
+     * // Update or create a PLocation
+     * const pLocation = await prisma.pLocation.upsert({
+     *   create: {
+     *     // ... data to create a PLocation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PLocation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends pLocationUpsertArgs>(args: SelectSubset<T, pLocationUpsertArgs<ExtArgs>>): Prisma__pLocationClient<$Result.GetResult<Prisma.$pLocationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PLocations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationCountArgs} args - Arguments to filter PLocations to count.
+     * @example
+     * // Count the number of PLocations
+     * const count = await prisma.pLocation.count({
+     *   where: {
+     *     // ... the filter for the PLocations we want to count
+     *   }
+     * })
+    **/
+    count<T extends pLocationCountArgs>(
+      args?: Subset<T, pLocationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PLocationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PLocation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PLocationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PLocationAggregateArgs>(args: Subset<T, PLocationAggregateArgs>): Prisma.PrismaPromise<GetPLocationAggregateType<T>>
+
+    /**
+     * Group by PLocation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pLocationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends pLocationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: pLocationGroupByArgs['orderBy'] }
+        : { orderBy?: pLocationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, pLocationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPLocationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the pLocation model
+   */
+  readonly fields: pLocationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for pLocation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__pLocationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the pLocation model
+   */
+  interface pLocationFieldRefs {
+    readonly id: FieldRef<"pLocation", 'String'>
+    readonly vehicleId: FieldRef<"pLocation", 'String'>
+    readonly latitude: FieldRef<"pLocation", 'Float'>
+    readonly longitude: FieldRef<"pLocation", 'Float'>
+    readonly speed: FieldRef<"pLocation", 'Float'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * pLocation findUnique
+   */
+  export type pLocationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter, which pLocation to fetch.
+     */
+    where: pLocationWhereUniqueInput
+  }
+
+  /**
+   * pLocation findUniqueOrThrow
+   */
+  export type pLocationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter, which pLocation to fetch.
+     */
+    where: pLocationWhereUniqueInput
+  }
+
+  /**
+   * pLocation findFirst
+   */
+  export type pLocationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter, which pLocation to fetch.
+     */
+    where?: pLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pLocations to fetch.
+     */
+    orderBy?: pLocationOrderByWithRelationInput | pLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for pLocations.
+     */
+    cursor?: pLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of pLocations.
+     */
+    distinct?: PLocationScalarFieldEnum | PLocationScalarFieldEnum[]
+  }
+
+  /**
+   * pLocation findFirstOrThrow
+   */
+  export type pLocationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter, which pLocation to fetch.
+     */
+    where?: pLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pLocations to fetch.
+     */
+    orderBy?: pLocationOrderByWithRelationInput | pLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for pLocations.
+     */
+    cursor?: pLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of pLocations.
+     */
+    distinct?: PLocationScalarFieldEnum | PLocationScalarFieldEnum[]
+  }
+
+  /**
+   * pLocation findMany
+   */
+  export type pLocationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter, which pLocations to fetch.
+     */
+    where?: pLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pLocations to fetch.
+     */
+    orderBy?: pLocationOrderByWithRelationInput | pLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing pLocations.
+     */
+    cursor?: pLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pLocations.
+     */
+    skip?: number
+    distinct?: PLocationScalarFieldEnum | PLocationScalarFieldEnum[]
+  }
+
+  /**
+   * pLocation create
+   */
+  export type pLocationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * The data needed to create a pLocation.
+     */
+    data: XOR<pLocationCreateInput, pLocationUncheckedCreateInput>
+  }
+
+  /**
+   * pLocation createMany
+   */
+  export type pLocationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many pLocations.
+     */
+    data: pLocationCreateManyInput | pLocationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * pLocation createManyAndReturn
+   */
+  export type pLocationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * The data used to create many pLocations.
+     */
+    data: pLocationCreateManyInput | pLocationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * pLocation update
+   */
+  export type pLocationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * The data needed to update a pLocation.
+     */
+    data: XOR<pLocationUpdateInput, pLocationUncheckedUpdateInput>
+    /**
+     * Choose, which pLocation to update.
+     */
+    where: pLocationWhereUniqueInput
+  }
+
+  /**
+   * pLocation updateMany
+   */
+  export type pLocationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update pLocations.
+     */
+    data: XOR<pLocationUpdateManyMutationInput, pLocationUncheckedUpdateManyInput>
+    /**
+     * Filter which pLocations to update
+     */
+    where?: pLocationWhereInput
+    /**
+     * Limit how many pLocations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * pLocation updateManyAndReturn
+   */
+  export type pLocationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * The data used to update pLocations.
+     */
+    data: XOR<pLocationUpdateManyMutationInput, pLocationUncheckedUpdateManyInput>
+    /**
+     * Filter which pLocations to update
+     */
+    where?: pLocationWhereInput
+    /**
+     * Limit how many pLocations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * pLocation upsert
+   */
+  export type pLocationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * The filter to search for the pLocation to update in case it exists.
+     */
+    where: pLocationWhereUniqueInput
+    /**
+     * In case the pLocation found by the `where` argument doesn't exist, create a new pLocation with this data.
+     */
+    create: XOR<pLocationCreateInput, pLocationUncheckedCreateInput>
+    /**
+     * In case the pLocation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<pLocationUpdateInput, pLocationUncheckedUpdateInput>
+  }
+
+  /**
+   * pLocation delete
+   */
+  export type pLocationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+    /**
+     * Filter which pLocation to delete.
+     */
+    where: pLocationWhereUniqueInput
+  }
+
+  /**
+   * pLocation deleteMany
+   */
+  export type pLocationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which pLocations to delete
+     */
+    where?: pLocationWhereInput
+    /**
+     * Limit how many pLocations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * pLocation without action
+   */
+  export type pLocationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pLocation
+     */
+    select?: pLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pLocation
+     */
+    omit?: pLocationOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model SpeedZone
    */
 
@@ -7260,6 +8388,17 @@ export namespace Prisma {
   export type VehicleLocationScalarFieldEnum = (typeof VehicleLocationScalarFieldEnum)[keyof typeof VehicleLocationScalarFieldEnum]
 
 
+  export const PLocationScalarFieldEnum: {
+    id: 'id',
+    vehicleId: 'vehicleId',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    speed: 'speed'
+  };
+
+  export type PLocationScalarFieldEnum = (typeof PLocationScalarFieldEnum)[keyof typeof PLocationScalarFieldEnum]
+
+
   export const SpeedZoneScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -7719,6 +8858,60 @@ export namespace Prisma {
     accuracy?: FloatNullableWithAggregatesFilter<"VehicleLocation"> | number | null
     satellites?: IntNullableWithAggregatesFilter<"VehicleLocation"> | number | null
     timestamp?: DateTimeWithAggregatesFilter<"VehicleLocation"> | Date | string
+  }
+
+  export type pLocationWhereInput = {
+    AND?: pLocationWhereInput | pLocationWhereInput[]
+    OR?: pLocationWhereInput[]
+    NOT?: pLocationWhereInput | pLocationWhereInput[]
+    id?: StringFilter<"pLocation"> | string
+    vehicleId?: StringFilter<"pLocation"> | string
+    latitude?: FloatFilter<"pLocation"> | number
+    longitude?: FloatFilter<"pLocation"> | number
+    speed?: FloatFilter<"pLocation"> | number
+  }
+
+  export type pLocationOrderByWithRelationInput = {
+    id?: SortOrder
+    vehicleId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+  }
+
+  export type pLocationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: pLocationWhereInput | pLocationWhereInput[]
+    OR?: pLocationWhereInput[]
+    NOT?: pLocationWhereInput | pLocationWhereInput[]
+    vehicleId?: StringFilter<"pLocation"> | string
+    latitude?: FloatFilter<"pLocation"> | number
+    longitude?: FloatFilter<"pLocation"> | number
+    speed?: FloatFilter<"pLocation"> | number
+  }, "id">
+
+  export type pLocationOrderByWithAggregationInput = {
+    id?: SortOrder
+    vehicleId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+    _count?: pLocationCountOrderByAggregateInput
+    _avg?: pLocationAvgOrderByAggregateInput
+    _max?: pLocationMaxOrderByAggregateInput
+    _min?: pLocationMinOrderByAggregateInput
+    _sum?: pLocationSumOrderByAggregateInput
+  }
+
+  export type pLocationScalarWhereWithAggregatesInput = {
+    AND?: pLocationScalarWhereWithAggregatesInput | pLocationScalarWhereWithAggregatesInput[]
+    OR?: pLocationScalarWhereWithAggregatesInput[]
+    NOT?: pLocationScalarWhereWithAggregatesInput | pLocationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"pLocation"> | string
+    vehicleId?: StringWithAggregatesFilter<"pLocation"> | string
+    latitude?: FloatWithAggregatesFilter<"pLocation"> | number
+    longitude?: FloatWithAggregatesFilter<"pLocation"> | number
+    speed?: FloatWithAggregatesFilter<"pLocation"> | number
   }
 
   export type SpeedZoneWhereInput = {
@@ -8191,6 +9384,62 @@ export namespace Prisma {
     accuracy?: NullableFloatFieldUpdateOperationsInput | number | null
     satellites?: NullableIntFieldUpdateOperationsInput | number | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type pLocationCreateInput = {
+    id?: string
+    vehicleId: string
+    latitude: number
+    longitude: number
+    speed?: number
+  }
+
+  export type pLocationUncheckedCreateInput = {
+    id?: string
+    vehicleId: string
+    latitude: number
+    longitude: number
+    speed?: number
+  }
+
+  export type pLocationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehicleId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    speed?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type pLocationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehicleId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    speed?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type pLocationCreateManyInput = {
+    id?: string
+    vehicleId: string
+    latitude: number
+    longitude: number
+    speed?: number
+  }
+
+  export type pLocationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehicleId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    speed?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type pLocationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehicleId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    speed?: FloatFieldUpdateOperationsInput | number
   }
 
   export type SpeedZoneCreateInput = {
@@ -8826,6 +10075,42 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type pLocationCountOrderByAggregateInput = {
+    id?: SortOrder
+    vehicleId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+  }
+
+  export type pLocationAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+  }
+
+  export type pLocationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    vehicleId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+  }
+
+  export type pLocationMinOrderByAggregateInput = {
+    id?: SortOrder
+    vehicleId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
+  }
+
+  export type pLocationSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    speed?: SortOrder
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<

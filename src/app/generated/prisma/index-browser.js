@@ -160,6 +160,14 @@ exports.Prisma.VehicleLocationScalarFieldEnum = {
   timestamp: 'timestamp'
 };
 
+exports.Prisma.PLocationScalarFieldEnum = {
+  id: 'id',
+  vehicleId: 'vehicleId',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  speed: 'speed'
+};
+
 exports.Prisma.SpeedZoneScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -251,6 +259,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   Vehicle: 'Vehicle',
   VehicleLocation: 'VehicleLocation',
+  pLocation: 'pLocation',
   SpeedZone: 'SpeedZone',
   Violation: 'Violation'
 };
