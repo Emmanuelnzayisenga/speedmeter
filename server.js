@@ -1,7 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws";
 import axios from "axios";
+import { createServer } from "http";
 
-const PORT           = process.env.PORT || 3001;
+const PORT           = process.env.PORT || 10000;
 const SPEED_LIMIT    = 60;
 const SERVER_ADDRESS = "https://speedmeter-rceq.onrender.com";
 
@@ -37,9 +38,16 @@ async function safePost(label, url, body) {
   }
 }
 
-const wss = new WebSocketServer({ port: PORT, path: "/ws/gps" });
+const httpServer = createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("GPS WebSocket Server is running\n");
+});
 
-log("🚀 WS", `GPS WebSocket Server listening`, `port=${PORT} path=/ws/gps`);
+const wss = new WebSocketServer({ server: httpServer, path: "/ws/gps" });
+
+httpServer.listen(PORT, () => {
+  log("🚀 WS", `GPS WebSocket Server listening`, `port=${PORT} path=/ws/gps`);
+});
 
 wss.on("connection", (ws, req) => {
   const clientIp = req.socket.remoteAddress;
