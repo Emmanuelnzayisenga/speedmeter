@@ -87,12 +87,12 @@ function Page() {
           {isPending ? "Signing in..." : "Submit"}
         </Button>
 
-        <div className="mt-4 text-sm">
+        {/* <div className="mt-4 text-sm">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-blue-500 hover:underline">
             Register here
           </Link>
-        </div>
+        </div> */}
       </form>
     </div>
   );
