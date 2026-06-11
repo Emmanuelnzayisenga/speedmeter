@@ -17,6 +17,7 @@ const navItems = [
   { href: '/vehicles', label: 'Vehicles', icon: Car },
   { href: '/violations', label: 'Violations', icon: AlertTriangle },
   { href: '/analytics', label: 'Analytics', icon: BarChart2 },
+  {href: '/register', label: 'Add new user', icon: Shield },
   { href: '/logout', label: 'Logout', icon: LogOut },
 ]
 
