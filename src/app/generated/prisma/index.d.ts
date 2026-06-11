@@ -8881,14 +8881,14 @@ export namespace Prisma {
 
   export type pLocationWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    vehicleId?: string
     AND?: pLocationWhereInput | pLocationWhereInput[]
     OR?: pLocationWhereInput[]
     NOT?: pLocationWhereInput | pLocationWhereInput[]
-    vehicleId?: StringFilter<"pLocation"> | string
     latitude?: FloatFilter<"pLocation"> | number
     longitude?: FloatFilter<"pLocation"> | number
     speed?: FloatFilter<"pLocation"> | number
-  }, "id">
+  }, "id" | "vehicleId">
 
   export type pLocationOrderByWithAggregationInput = {
     id?: SortOrder

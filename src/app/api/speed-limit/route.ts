@@ -47,8 +47,8 @@ function pointNearCorridor(lat: number, lng: number, points: { lat: number; lng:
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const latStr  = searchParams.get("lat");
-  const lngStr  = searchParams.get("lng");
+  const latStr = searchParams.get("lat");
+  const lngStr = searchParams.get("lng");
   const deviceId = searchParams.get("device");
 
   if (!latStr || !lngStr) {
@@ -102,19 +102,17 @@ export async function GET(req: NextRequest) {
       }
 
       if (inside) {
-        matchedLimit    = zone.speedLimit;
+        matchedLimit = zone.speedLimit;
         matchedZoneName = zone.name;
         break;
       }
     }
 
     if (matchedLimit !== null) {
-      return NextResponse.json({ success: true, limit: String(matchedLimit), zone: matchedZoneName });
+      return NextResponse.json({ success: true, limit: matchedLimit, zone: matchedZoneName });
     }
 
-    console.log(`[speed-limit] No zone match for device ${deviceId} at (${lat}, ${lng})`);
-
-    return NextResponse.json({ success: true, limit: "60", zone: null, default: true });
+    return NextResponse.json({ success: true, limit: 60, zone: null, default: true });
 
   } catch (error) {
     console.error("[speed-limit] DB error:", error);

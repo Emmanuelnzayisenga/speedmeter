@@ -65,7 +65,7 @@ model VehicleLocation {
 
 model pLocation {
   id          String   @id @default(cuid())
-  vehicleId   String
+  vehicleId   String    @unique
   latitude    Float
   longitude   Float
   speed       Float    @default(0)

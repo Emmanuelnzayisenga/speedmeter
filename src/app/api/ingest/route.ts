@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
- function toFloat(value: unknown): number {
+function toFloat(value: unknown): number {
   if (typeof value === 'number') return value
   if (typeof value === 'string') return parseFloat(value)
   return NaN
-}
-
-function toInt(value: unknown): number | null {
-  if (value === undefined || value === null) return null
-  if (typeof value === 'number') return Math.round(value)
-  if (typeof value === 'string') return parseInt(value, 10)
-  return null
 }
 
 export async function POST(req: NextRequest) {
@@ -60,18 +53,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ✅ Replace old rows and insert fresh phone location into pLocation
-    await prisma.pLocation.deleteMany({ where: { vehicleId: vehicle.id } })
-    await prisma.pLocation.create({
-      data: {
-        vehicleId: vehicle.id,
-        latitude:  lat,
-        longitude: lng,
-        speed:     spd,
-      },
+    await prisma.pLocation.upsert({
+      where:  { vehicleId: vehicle.id },
+      update: { latitude: lat, longitude: lng, speed: spd },
+      create: { vehicleId: vehicle.id, latitude: lat, longitude: lng, speed: spd },
     })
 
-    return NextResponse.json({ success: true }) // ✅ was missing entirely
+    return NextResponse.json({ success: true })
 
   } catch (error) {
     console.error('[ingest] Unhandled error:', error)
