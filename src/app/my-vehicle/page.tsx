@@ -9,25 +9,50 @@ import { Button } from '@/components/ui/button'
 import { formatSpeed, formatCurrency, formatDate, VEHICLE_TYPE_ICONS, cn } from '@/lib/utils'
 import {
   Car, Gauge, Navigation, Clock, RefreshCw, AlertTriangle, MapPin, ArrowRight,
+  Brain, Sparkles, TrendingDown, TrendingUp, Minus,
 } from 'lucide-react'
+
+const RISK_BADGE: Record<string, 'success' | 'warning' | 'radar' | 'destructive'> = {
+  LOW: 'success', MODERATE: 'warning', HIGH: 'radar', CRITICAL: 'destructive',
+}
+const RISK_COLOR: Record<string, string> = {
+  LOW: 'text-sw-safe', MODERATE: 'text-sw-warn', HIGH: 'text-sw-radar', CRITICAL: 'text-sw-danger',
+}
+const TREND_ICON: Record<string, typeof TrendingUp> = {
+  improving: TrendingDown, worsening: TrendingUp, stable: Minus,
+}
+
+interface Insights {
+  riskScore: number
+  riskLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+  trend: 'improving' | 'worsening' | 'stable'
+  totalViolations: number
+  avgExcessSpeed: number
+  zoneBreakdown: { name: string; count: number; percentage: number }[]
+  statements: string[]
+}
 
 export default function MyVehiclePage() {
   const [vehicle, setVehicle] = useState<any>(null)
   const [zones, setZones] = useState<any[]>([])
+  const [insights, setInsights] = useState<Insights | null>(null)
   const [loading, setLoading] = useState(true)
   const [speedAhead, setSpeedAhead] = useState<{ distanceMeters: number; etaSeconds: number | null; zone: { name: string; speedLimit: number } } | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [vehicleRes, zonesRes] = await Promise.all([
+      const [vehicleRes, zonesRes, insightsRes] = await Promise.all([
         fetch('/api/my-vehicle'),
         fetch('/api/zones?active=true'),
+        fetch('/api/my-vehicle/insights'),
       ])
       const vehicleData = await vehicleRes.json()
       const zonesData = await zonesRes.json()
+      const insightsData = await insightsRes.json()
       setVehicle(vehicleData.vehicle || null)
       setZones(zonesData.zones || [])
+      setInsights(insightsData.insights || null)
     } finally {
       setLoading(false)
     }
@@ -181,6 +206,68 @@ export default function MyVehiclePage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {vehicle && insights && (
+          <div className="bg-card border border-border rounded-lg overflow-hidden panel-glow flex-shrink-0">
+            <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4 text-primary" />
+                <span className="text-sm font-display font-bold tracking-wider">AI DRIVING INSIGHTS</span>
+                <Badge variant="outline" className="text-[9px]">BETA</Badge>
+              </div>
+              <Badge variant={RISK_BADGE[insights.riskLevel]} className="text-[10px]">
+                {insights.riskLevel} RISK
+              </Badge>
+            </div>
+
+            <div className="p-4 grid md:grid-cols-3 gap-4">
+              {/* Risk score */}
+              <div className="flex flex-col items-center justify-center gap-1 md:border-r md:border-border/50 md:pr-4">
+                <p className={cn("text-3xl font-mono font-bold", RISK_COLOR[insights.riskLevel])}>
+                  {insights.riskScore}
+                </p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Risk Score / 100</p>
+                <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
+                  {React.createElement(TREND_ICON[insights.trend], {
+                    className: cn(
+                      "w-3 h-3",
+                      insights.trend === 'improving' && 'text-sw-safe',
+                      insights.trend === 'worsening' && 'text-sw-danger'
+                    ),
+                  })}
+                  <span className="capitalize">{insights.trend}</span>
+                </div>
+              </div>
+
+              {/* Generated insight statements */}
+              <div className="md:col-span-2 space-y-2">
+                {insights.statements.map((s, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    <Sparkles className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {insights.zoneBreakdown.length > 0 && (
+              <div className="px-4 pb-4 space-y-1.5 border-t border-border/50 pt-3">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1.5">Zone Risk Breakdown</p>
+                {insights.zoneBreakdown.map(z => (
+                  <div key={z.name} className="flex items-center gap-2">
+                    <span className="text-xs w-28 truncate flex-shrink-0">{z.name}</span>
+                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full bg-sw-danger rounded-full transition-all" style={{ width: `${z.percentage}%` }} />
+                    </div>
+                    <span className="text-[10px] font-mono text-muted-foreground w-16 text-right flex-shrink-0">
+                      {z.count} ({z.percentage}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
