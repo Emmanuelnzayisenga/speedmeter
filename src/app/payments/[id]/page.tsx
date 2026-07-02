@@ -55,6 +55,7 @@ interface Violation {
   vehicle: {
     name: string;
     plateNumber: string;
+    driverPhone: string | null;
   };
   zone: {
     name: string;
@@ -152,7 +153,7 @@ export default function PayViolationPage() {
     payment_options: "mobilemoney,card",
     customer: {
       email: "driver@example.com",
-      phone_number: violation?.vehicle ? "" : "",
+      phone_number: violation?.vehicle?.driverPhone ?? "",
       name: violation?.vehicle?.name ?? "Driver",
     },
     customizations: {
@@ -235,13 +236,13 @@ export default function PayViolationPage() {
   if (error || !violation) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md text-center">
+        <Card className="w-full max-w-md text-center panel-glow">
           <CardContent className="pt-10 pb-8 space-y-4">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-              <XCircle className="h-7 w-7 text-primary" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sw-danger/10">
+              <XCircle className="h-7 w-7 text-sw-danger" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Violation Not Found</h2>
+              <h2 className="text-lg font-display font-bold tracking-wide">Violation Not Found</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {error ?? "The violation you're looking for doesn't exist or has been removed."}
               </p>
@@ -264,13 +265,13 @@ export default function PayViolationPage() {
   if (paid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md text-center">
+        <Card className="w-full max-w-md text-center panel-glow">
           <CardContent className="pt-10 pb-8 space-y-5">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-8 w-8 text-primary" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-sw-safe/10">
+              <CheckCircle2 className="h-8 w-8 text-sw-safe" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold">Fine Paid</h2>
+              <h2 className="text-xl font-display font-bold tracking-wide">Fine Paid</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Your traffic violation fine has been paid and the case is resolved.
               </p>
@@ -282,7 +283,7 @@ export default function PayViolationPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Amount Paid</span>
-                <span className="font-semibold text-primary">
+                <span className="font-mono font-semibold text-sw-safe">
                   RWF {violation.fineAmount.toLocaleString()}
                 </span>
               </div>
@@ -316,7 +317,7 @@ export default function PayViolationPage() {
           </Button>
           <div className="flex items-center gap-2 min-w-0">
             <ShieldAlert className="h-4 w-4 shrink-0 text-primary" />
-            <span className="truncate text-sm font-medium">Traffic Violation Fine</span>
+            <span className="truncate text-sm font-display font-semibold tracking-wide">SPEEDWATCH · Fine Payment</span>
           </div>
           <div className="ml-auto">
             <StatusBadge status={violation.status} />
@@ -344,14 +345,14 @@ export default function PayViolationPage() {
         )}
 
         {/* Fine amount hero */}
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden panel-glow">
           <div className="bg-destructive/5 border-b px-6 py-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">
                   Fine Amount Due
                 </p>
-                <p className="text-4xl font-bold tracking-tight">
+                <p className="text-4xl font-mono font-bold tracking-tight">
                   RWF{" "}
                   <span className="text-primary">
                     {violation.fineAmount.toLocaleString()}
@@ -376,10 +377,10 @@ export default function PayViolationPage() {
                 label="Speed Recorded"
                 value={
                   <span>
-                    <span className="text-primary font-semibold">{violation.speed} km/h</span>
+                    <span className="text-primary font-mono font-semibold">{violation.speed} km/h</span>
                     {" "}in a {violation.speedLimit} km/h zone
                     {" "}
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs font-mono text-muted-foreground">
                       (+{violation.excessSpeed} km/h over limit)
                     </span>
                   </span>
@@ -416,9 +417,9 @@ export default function PayViolationPage() {
 
         {/* Payment summary */}
         {canPay && (
-          <Card>
+          <Card className="panel-glow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <CardTitle className="text-sm font-display font-semibold tracking-wide flex items-center gap-2">
                 <Receipt className="h-4 w-4" />
                 Payment Summary
               </CardTitle>
@@ -427,7 +428,7 @@ export default function PayViolationPage() {
               <div className="rounded-lg bg-muted/50 divide-y">
                 <div className="flex justify-between px-3 py-2.5 text-sm">
                   <span className="text-muted-foreground">Violation fine</span>
-                  <span className="font-medium">RWF {violation.fineAmount.toLocaleString()}</span>
+                  <span className="font-mono font-medium">RWF {violation.fineAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between px-3 py-2.5 text-sm">
                   <span className="text-muted-foreground">Processing fee</span>
@@ -439,7 +440,7 @@ export default function PayViolationPage() {
 
               <div className="flex justify-between text-sm font-semibold">
                 <span>Total Due</span>
-                <span className="text-primary text-base">
+                <span className="text-primary font-mono text-base">
                   RWF {violation.fineAmount.toLocaleString()}
                 </span>
               </div>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+const ZONE_TYPES = ['POLYGON', 'CIRCLE', 'CORRIDOR', 'ROAD']
+
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const zone = await prisma.speedZone.findUnique({
@@ -25,9 +27,28 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   try {
     const body = await req.json()
     const { name, description, speedLimit, coordinates, zoneType, color, active } = body
+
+    if (zoneType !== undefined && !ZONE_TYPES.includes(zoneType)) {
+      return NextResponse.json(
+        { error: `zoneType must be one of ${ZONE_TYPES.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    let parsedSpeedLimit: number | undefined
+    if (speedLimit !== undefined) {
+      parsedSpeedLimit = typeof speedLimit === 'number' ? speedLimit : parseFloat(speedLimit)
+      if (isNaN(parsedSpeedLimit) || parsedSpeedLimit <= 0) {
+        return NextResponse.json(
+          { error: 'speedLimit must be a positive number' },
+          { status: 400 }
+        )
+      }
+    }
+
     const zone = await prisma.speedZone.update({
       where: { id: params.id },
-      data: { name, description, speedLimit: speedLimit ? parseFloat(speedLimit) : undefined, coordinates, zoneType, color, active },
+      data: { name, description, speedLimit: parsedSpeedLimit, coordinates, zoneType, color, active },
     })
     return NextResponse.json(zone)
   } catch (error: any) {

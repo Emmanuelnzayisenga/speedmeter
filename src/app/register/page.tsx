@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AuthShell } from "@/components/auth/AuthShell";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -10,6 +12,24 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+
+const phoneInputStyle = {
+  width: '100%',
+  height: '2.5rem',
+  backgroundColor: 'hsl(var(--secondary))',
+  color: 'hsl(var(--foreground))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '0.375rem',
+}
+const phoneButtonStyle = {
+  backgroundColor: 'hsl(var(--secondary))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '0.375rem 0 0 0.375rem',
+}
+const phoneDropdownStyle = {
+  backgroundColor: 'hsl(var(--card))',
+  color: 'hsl(var(--foreground))',
+}
 export const dynamic = "force-dynamic";
 
 function Page(this: any) {
@@ -75,35 +95,27 @@ function Page(this: any) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
-
-      <form
-        className="bg-background p-6 rounded shadow-md w-full max-w-sm border"
-        autoComplete="off"
-        onSubmit={handleSubmit}
-      >
-        <div className="flex flex-col justify-center gap-2 flex-1">
-          <label htmlFor="username">Email</label>
+    <AuthShell title="CREATE ACCOUNT" subtitle="Fleet Monitor">
+      <form autoComplete="off" onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="username">Email</Label>
           <Input
             onChange={handleChange}
             type="email"
             id="username"
             name="username"
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             autoComplete="off"
           />
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <label htmlFor="phoneNumber">Phone Number</label>
-
+        <div className="space-y-1.5">
+          <Label htmlFor="phoneNumber">Phone Number</Label>
           <PhoneInput
             containerStyle={{ width: "100%" }}
-            inputStyle={{
-              color: "black",
-              width:"100%"
-            }}
+            inputStyle={phoneInputStyle}
+            buttonStyle={phoneButtonStyle}
+            dropdownStyle={phoneDropdownStyle}
             enableTerritories
             enableSearch
             enableAreaCodes
@@ -117,51 +129,50 @@ function Page(this: any) {
             country={'rw'}
             value={formData.phoneNumber}
             onChange={(phone) => setFormData({ ...formData, phoneNumber: phone })}
-           
           />
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <label htmlFor="password">Password</label>
+        <div className="space-y-1.5">
+          <Label htmlFor="password">Password</Label>
           <Input
             onChange={handleChange}
             type="password"
             id="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             autoComplete="off"
           />
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <label htmlFor="confirmPassword">Confirm Password</label>
+        <div className="space-y-1.5">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input
             onChange={handleChange}
             type="password"
             id="confirmPassword"
             name="confirmPassword"
-            placeholder="Confirm your password"
+            placeholder="••••••••"
             autoComplete="off"
           />
         </div>
+
         {error && (
-          <p className="text-sm text-red-500 mt-2">{error}</p>
+          <p className="text-sm text-sw-danger">{error}</p>
         )}
 
-
-        <Button className="p-2 w-full mt-4" disabled={pending}>
-          {pending ? <Loader2 className="animate-spin mr-2" /> : null}
-          Submit
+        <Button className="w-full gap-2" disabled={pending}>
+          {pending && <Loader2 className="w-4 h-4 animate-spin" />}
+          {pending ? "Creating account…" : "Create Account"}
         </Button>
 
-        <div className="mt-4 text-sm">
+        <p className="text-center text-xs text-muted-foreground pt-1">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-500 hover:underline">
-            Login here
+          <Link href="/login" className="text-primary hover:underline">
+            Sign in
           </Link>
-        </div>
+        </p>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 

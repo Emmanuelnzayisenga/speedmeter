@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+const ZONE_TYPES = ['POLYGON', 'CIRCLE', 'CORRIDOR', 'ROAD']
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -31,8 +33,26 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const parsed = parseFloat(speedLimit)
-    if (isNaN(parsed) || parsed <= 0) {
+    if (!ZONE_TYPES.includes(zoneType)) {
+      return NextResponse.json(
+        { error: `zoneType must be one of ${ZONE_TYPES.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    if (typeof coordinates !== 'object' || coordinates === null) {
+      return NextResponse.json(
+        { error: 'coordinates must be an object or array' },
+        { status: 400 }
+      )
+    }
+
+    const isValidNumeric =
+      typeof speedLimit === 'number'
+        ? Number.isFinite(speedLimit)
+        : /^-?\d+(\.\d+)?$/.test(String(speedLimit).trim())
+    const parsed = typeof speedLimit === 'number' ? speedLimit : parseFloat(speedLimit)
+    if (!isValidNumeric || isNaN(parsed) || parsed <= 0) {
       return NextResponse.json(
         { error: 'speedLimit must be a positive number' },
         { status: 400 }

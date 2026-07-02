@@ -126,11 +126,20 @@ exports.Prisma.UserScalarFieldEnum = {
   username: 'username',
   email: 'email',
   phoneNumber: 'phoneNumber',
+  role: 'role',
   isActive: 'isActive',
   lastLogin: 'lastLogin',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   password: 'password'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.VehicleScalarFieldEnum = {
@@ -141,6 +150,7 @@ exports.Prisma.VehicleScalarFieldEnum = {
   status: 'status',
   driverName: 'driverName',
   driverPhone: 'driverPhone',
+  driverId: 'driverId',
   deviceId: 'deviceId',
   color: 'color',
   createdAt: 'createdAt',
@@ -199,6 +209,14 @@ exports.Prisma.ViolationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SystemSettingsScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  description: 'description',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -223,6 +241,13 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.Role = exports.$Enums.Role = {
+  ADMIN: 'ADMIN',
+  OPERATOR: 'OPERATOR',
+  VIEWER: 'VIEWER',
+  DRIVER: 'DRIVER'
+};
+
 exports.VehicleType = exports.$Enums.VehicleType = {
   CAR: 'CAR',
   TRUCK: 'TRUCK',
@@ -257,11 +282,13 @@ exports.ViolationStatus = exports.$Enums.ViolationStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  PasswordResetToken: 'PasswordResetToken',
   Vehicle: 'Vehicle',
   VehicleLocation: 'VehicleLocation',
   pLocation: 'pLocation',
   SpeedZone: 'SpeedZone',
-  Violation: 'Violation'
+  Violation: 'Violation',
+  SystemSettings: 'SystemSettings'
 };
 
 /**

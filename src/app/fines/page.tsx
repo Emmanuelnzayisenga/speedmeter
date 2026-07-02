@@ -72,10 +72,10 @@ const STATUS_CONFIG: Record<
   ViolationStatus,
   { label: string; color: string; icon: React.ElementType; dot: string }
 > = {
-  PENDING: { label: "Pending", color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800", icon: Clock, dot: "bg-amber-500" },
-  CONFIRMED: { label: "Confirmed", color: "text-red-600 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800", icon: AlertTriangle, dot: "bg-red-500" },
-  DISPUTED: { label: "Disputed", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800", icon: FileText, dot: "bg-blue-500" },
-  RESOLVED: { label: "Resolved", color: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800", icon: CheckCircle2, dot: "bg-emerald-500" },
+  PENDING: { label: "Pending", color: "text-sw-warn bg-sw-warn/10 border-sw-warn/30", icon: Clock, dot: "bg-sw-warn" },
+  CONFIRMED: { label: "Confirmed", color: "text-sw-danger bg-sw-danger/10 border-sw-danger/30", icon: AlertTriangle, dot: "bg-sw-danger" },
+  DISPUTED: { label: "Disputed", color: "text-sw-radar bg-sw-radar/10 border-sw-radar/30", icon: FileText, dot: "bg-sw-radar" },
+  RESOLVED: { label: "Resolved", color: "text-sw-safe bg-sw-safe/10 border-sw-safe/30", icon: CheckCircle2, dot: "bg-sw-safe" },
   CANCELLED: { label: "Cancelled", color: "text-muted-foreground bg-muted border-border", icon: XCircle, dot: "bg-muted-foreground" },
 };
 
@@ -100,7 +100,7 @@ function StatusPill({ status }: { status: ViolationStatus }) {
 
 function SeverityBar({ excess }: { excess: number }) {
   const pct = Math.min(100, (excess / 60) * 100);
-  const color = excess < 15 ? "bg-amber-400" : excess < 30 ? "bg-orange-500" : "bg-destructive";
+  const color = excess < 15 ? "bg-sw-warn" : excess < 30 ? "bg-sw-warn" : "bg-sw-danger";
   return (
     <div className="flex items-center gap-2">
       <div className="h-1.5 w-20 rounded-full bg-muted overflow-hidden">
@@ -115,7 +115,7 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
   const canPay = (v.status === "PENDING" || v.status === "CONFIRMED") && v.fineAmount > 0;
 
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5 duration-200">
+    <Card className="group overflow-hidden panel-glow transition-all hover:-translate-y-0.5 duration-200">
       {/* Top accent strip */}
       <div className={cn("h-1 w-full", STATUS_CONFIG[v.status].dot)} />
 
@@ -127,7 +127,7 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
               <Car className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">{v.vehicle.plateNumber}</p>
+              <p className="font-mono font-semibold text-sm truncate">{v.vehicle.plateNumber}</p>
               <p className="text-xs text-muted-foreground truncate">{v.vehicle.name}</p>
             </div>
           </div>
@@ -139,16 +139,16 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
         {/* Speed info */}
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="rounded-md bg-muted/60 py-2 px-1">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Recorded</p>
-            <p className="text-sm font-bold text-destructive">{v.speed} <span className="text-[10px] font-normal">km/h</span></p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Recorded</p>
+            <p className="text-sm font-mono font-bold text-sw-danger">{v.speed} <span className="text-[10px] font-normal">km/h</span></p>
           </div>
           <div className="rounded-md bg-muted/60 py-2 px-1">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Limit</p>
-            <p className="text-sm font-bold">{v.speedLimit} <span className="text-[10px] font-normal">km/h</span></p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Limit</p>
+            <p className="text-sm font-mono font-bold">{v.speedLimit} <span className="text-[10px] font-normal">km/h</span></p>
           </div>
           <div className="rounded-md bg-muted/60 py-2 px-1">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Excess</p>
-            <p className="text-sm font-bold text-orange-500">+{v.excessSpeed} <span className="text-[10px] font-normal">km/h</span></p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">Excess</p>
+            <p className="text-sm font-mono font-bold text-sw-warn">+{v.excessSpeed} <span className="text-[10px] font-normal">km/h</span></p>
           </div>
         </div>
 
@@ -169,8 +169,8 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
         {/* Fine + action */}
         <div className="flex items-center justify-between pt-1">
           <div>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Fine</p>
-            <p className={cn("text-lg font-bold", v.fineAmount > 0 ? "text-foreground" : "text-muted-foreground")}>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Fine</p>
+            <p className={cn("text-lg font-mono font-bold", v.fineAmount > 0 ? "text-foreground" : "text-muted-foreground")}>
               {v.fineAmount > 0 ? `RWF ${v.fineAmount.toLocaleString()}` : "—"}
             </p>
           </div>
@@ -181,7 +181,7 @@ function ViolationCard({ v, onPay }: { v: Violation; onPay: (id: string) => void
               <ChevronRight className="h-3 w-3" />
             </Button>
           ) : v.status === "RESOLVED" ? (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+            <span className="flex items-center gap-1.5 text-xs text-sw-safe font-medium">
               <CheckCircle2 className="h-4 w-4" /> Paid
             </span>
           ) : (
@@ -207,14 +207,14 @@ function ResultsSummary({ violations }: { violations: Violation[] }) {
     <div className="grid grid-cols-3 gap-3">
       {[
         { label: "Total Violations", value: violations.length, icon: ShieldAlert, color: "text-foreground" },
-        { label: "Unpaid Fines", value: `RWF ${totalDue.toLocaleString()}`, icon: Banknote, color: "text-destructive" },
-        { label: "Resolved", value: resolved, icon: CheckCircle2, color: "text-emerald-600" },
+        { label: "Unpaid Fines", value: `RWF ${totalDue.toLocaleString()}`, icon: Banknote, color: "text-sw-danger" },
+        { label: "Resolved", value: resolved, icon: CheckCircle2, color: "text-sw-safe" },
       ].map(({ label, value, icon: Icon, color }) => (
-        <Card key={label}>
+        <Card key={label} className="panel-glow">
           <CardContent className="p-3 text-center">
             <Icon className={cn("h-4 w-4 mx-auto mb-1", color)} />
-            <p className={cn("text-lg font-bold", color)}>{value}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">{label}</p>
+            <p className={cn("text-lg font-mono font-bold", color)}>{value}</p>
+            <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-wide">{label}</p>
           </CardContent>
         </Card>
       ))}
@@ -279,22 +279,25 @@ export default function CheckFinesPage() {
     <div className="min-h-screen bg-background">
       <div className="flex m-2">
         <button className="text-primary font-bolder" onClick={() => {
-          window.navigation.back()
+          router.back()
         }}> <ArrowLeft /></button>
       </div>
       <div className="border-b bg-muted/30 h-full">
         <div className="mx-auto max-w-2xl px-4 py-8 space-y-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
-              <ShieldAlert className="h-5 w-5 text-primary" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sw-danger/10 border border-sw-danger/20">
+              <ShieldAlert className="h-5 w-5 text-sw-danger" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Traffic Fine Lookup</h1>
+              <p className="text-[10px] text-muted-foreground tracking-widest uppercase">SpeedWatch</p>
+              <h1 className="text-xl font-display font-bold tracking-wide">Traffic Fine Lookup</h1>
               <p className="text-xs text-muted-foreground">Search outstanding violations by plate, phone, or ID</p>
             </div>
           </div>
 
-          <Tabs value={mode} onValueChange={(v) => { setMode(v as SearchMode); setQuery(""); }}>
+          <Tabs value={mode} onValueChange={(v) => {
+            setMode(v as SearchMode); setQuery(""); setViolations(null); setSearched(false); setError(null)
+          }}>
             <TabsList className="w-full">
               {SEARCH_MODES.map(m => {
                 const Icon = m.icon;
@@ -367,11 +370,11 @@ export default function CheckFinesPage() {
 
         {/* Error */}
         {!isPending && error && (
-          <Card className="border-destructive/30 bg-destructive/5">
+          <Card className="border-sw-danger/30 bg-sw-danger/5 panel-glow">
             <CardContent className="flex items-center gap-3 py-4 px-4">
-              <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+              <AlertTriangle className="h-5 w-5 shrink-0 text-sw-danger" />
               <div>
-                <p className="text-sm font-medium text-destructive">Search Failed</p>
+                <p className="text-sm font-medium text-sw-danger">Search Failed</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{error}</p>
               </div>
             </CardContent>
@@ -385,12 +388,12 @@ export default function CheckFinesPage() {
               <Search className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-sm">No violations found</p>
+              <p className="font-display font-medium text-sm tracking-wide">No violations found</p>
               <p className="text-xs text-muted-foreground mt-1">
                 No traffic fines are linked to <span className="font-mono font-medium">{query}</span>
               </p>
             </div>
-            <Badge variant="outline" className="text-xs text-emerald-600 border-emerald-200 bg-emerald-50 gap-1.5">
+            <Badge variant="success" className="text-xs gap-1.5">
               <CheckCircle2 className="h-3 w-3" /> Clean record
             </Badge>
           </div>
@@ -452,13 +455,13 @@ export default function CheckFinesPage() {
 
             {/* Pay all CTA if multiple unpaid */}
             {violations!.filter(v => (v.status === "PENDING" || v.status === "CONFIRMED") && v.fineAmount > 0).length > 1 && (
-              <Card className="border-destructive/20 bg-destructive/5">
+              <Card className="border-sw-danger/20 bg-sw-danger/5 panel-glow">
                 <CardContent className="flex items-center justify-between gap-3 py-3 px-4">
                   <div>
-                    <p className="text-sm font-semibold text-destructive">Multiple unpaid fines</p>
+                    <p className="text-sm font-display font-semibold tracking-wide text-sw-danger">Multiple unpaid fines</p>
                     <p className="text-xs text-muted-foreground">
                       Total due:{" "}
-                      <span className="font-medium text-foreground">
+                      <span className="font-mono font-medium text-foreground">
                         RWF{" "}
                         {violations!
                           .filter(v => v.status === "PENDING" || v.status === "CONFIRMED")

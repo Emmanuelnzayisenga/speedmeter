@@ -15,13 +15,37 @@ model User {
   username    String?   @map("username") @db.VarChar(255)
   email       String    @map("email") @db.VarChar(255)
   phoneNumber String    @map("phone_number") @db.VarChar(20)
+  role        Role      @default(VIEWER) @map("role")
   isActive    Boolean   @default(false) @map("is_active")
   lastLogin   DateTime? @map("last_login")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   password    String    @db.Text
 
+  vehicle     Vehicle?
+  resetTokens PasswordResetToken[]
+
   @@unique([username, email])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+  DRIVER
 }
 
 model Vehicle {
@@ -32,6 +56,7 @@ model Vehicle {
   status      VehicleStatus @default(INACTIVE)
   driverName  String?
   driverPhone String?
+  driverId    String?       @unique
   deviceId    String?       @unique
   color       String?       @default("#3B82F6")
   createdAt   DateTime      @default(now())
@@ -39,9 +64,11 @@ model Vehicle {
 
   locations  VehicleLocation[]
   violations Violation[]
+  driverUser User?             @relation(fields: [driverId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([deviceId])
+  @@index([driverId])
 }
 
 model VehicleLocation {
@@ -113,6 +140,16 @@ model Violation {
   @@index([vehicleId])
   @@index([status])
   @@index([timestamp])
+}
+
+model SystemSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
 }
 
 enum VehicleType {

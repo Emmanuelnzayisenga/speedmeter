@@ -18,6 +18,9 @@ const badgeVariants = cva(
           "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
+        success: "bg-sw-safe/15 text-sw-safe border-sw-safe/30 [a&]:hover:bg-sw-safe/25",
+        warning: "bg-sw-warn/15 text-sw-warn border-sw-warn/30 [a&]:hover:bg-sw-warn/25",
+        radar: "bg-sw-radar/15 text-sw-radar border-sw-radar/30 [a&]:hover:bg-sw-radar/25",
       },
     },
     defaultVariants: {
@@ -44,5 +47,7 @@ function Badge({
     />
   )
 }
+
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
 
 export { Badge, badgeVariants }

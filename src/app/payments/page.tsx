@@ -44,14 +44,14 @@ interface Violation {
 
 
 const STATUS_STYLE: Record<ViolationStatus, string> = {
-  PENDING: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-400",
-  CONFIRMED: "text-red-700 bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400",
+  PENDING: "text-sw-warn bg-sw-warn/10 border-sw-warn/30",
+  CONFIRMED: "text-sw-danger bg-sw-danger/10 border-sw-danger/30",
 };
 
 function StatusPill({ status }: { status: ViolationStatus }) {
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide", STATUS_STYLE[status])}>
-      <span className={cn("h-1.5 w-1.5 rounded-full", status === "PENDING" ? "bg-amber-500" : "bg-red-500")} />
+      <span className={cn("h-1.5 w-1.5 rounded-full", status === "PENDING" ? "bg-sw-warn" : "bg-sw-danger")} />
       {status}
     </span>
   );
@@ -60,15 +60,15 @@ function StatusPill({ status }: { status: ViolationStatus }) {
 
 function ViolationCard({ v }: { v: Violation }) {
   return (
-    <Card className="overflow-hidden">
-      <div className={cn("h-0.5 w-full", v.status === "CONFIRMED" ? "bg-destructive" : "bg-amber-400")} />
+    <Card className="overflow-hidden panel-glow">
+      <div className={cn("h-0.5 w-full", v.status === "CONFIRMED" ? "bg-sw-danger" : "bg-sw-warn")} />
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1.5">
                 <Car className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="font-bold text-sm tracking-widest">{v.vehicle.plateNumber}</span>
+                <span className="font-mono font-bold text-sm tracking-widest">{v.vehicle.plateNumber}</span>
               </div>
               <span className="text-muted-foreground text-xs">·</span>
               <span className="text-xs text-muted-foreground truncate">{v.vehicle.name}</span>
@@ -76,12 +76,12 @@ function ViolationCard({ v }: { v: Violation }) {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="flex items-center gap-1.5 rounded-md bg-destructive/8 border border-destructive/20 px-2.5 py-1">
-                <Gauge className="h-3.5 w-3.5 text-destructive" />
-                <span className="text-xs font-bold text-destructive">{v.speed} km/h</span>
+              <div className="flex items-center gap-1.5 rounded-md bg-sw-danger/10 border border-sw-danger/20 px-2.5 py-1">
+                <Gauge className="h-3.5 w-3.5 text-sw-danger" />
+                <span className="text-xs font-mono font-bold text-sw-danger">{v.speed} km/h</span>
               </div>
               <span className="text-xs text-muted-foreground">in a {v.speedLimit} km/h zone</span>
-              <span className="text-xs font-medium text-orange-600">+{v.excessSpeed} km/h over</span>
+              <span className="text-xs font-mono font-medium text-sw-warn">+{v.excessSpeed} km/h over</span>
             </div>
 
             {/* Meta */}
@@ -102,10 +102,10 @@ function ViolationCard({ v }: { v: Violation }) {
           {/* Right: fine + pay */}
           <div className="flex flex-col items-end gap-3 shrink-0">
             <div className="text-right">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Fine</p>
-              <p className="text-xl font-black text-foreground leading-tight">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Fine</p>
+              <p className="text-xl font-mono font-bold text-foreground leading-tight">
                 {v.fineAmount > 0 ? (
-                  <>RWF <span className="text-destructive">{v.fineAmount.toLocaleString()}</span></>
+                  <>RWF <span className="text-sw-danger">{v.fineAmount.toLocaleString()}</span></>
                 ) : (
                   <span className="text-muted-foreground text-sm font-medium">Pending</span>
                 )}
@@ -183,7 +183,7 @@ export default function PaymentsPage() {
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-background">
       <div className="flex m-2">
         <button className="text-primary font-bolder" onClick={() => {
-          window.navigation.back()
+          router.back()
         }}> <ArrowLeft /></button>
       </div>
       <div
@@ -196,10 +196,11 @@ export default function PaymentsPage() {
           {/* Heading — only while idle */}
           {showIdle && (
             <div className="text-center space-y-2">
-              <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-destructive/10 mb-2">
-                <ShieldAlert className="h-6 w-6 text-destructive" />
+              <div className="inline-flex items-center justify-center h-12 w-12 rounded-2xl bg-sw-danger/10 border border-sw-danger/20 mb-2">
+                <ShieldAlert className="h-6 w-6 text-sw-danger" />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight">Pay a Traffic Fine</h1>
+              <p className="text-[11px] text-muted-foreground tracking-widest uppercase">SpeedWatch</p>
+              <h1 className="text-2xl font-display font-bold tracking-wide">Pay a Traffic Fine</h1>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 Enter your vehicle plate number to find outstanding fines and pay securely online.
               </p>
@@ -209,8 +210,8 @@ export default function PaymentsPage() {
           {/* Compact heading after search */}
           {!showIdle && (
             <div className="flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-destructive" />
-              <span className="text-sm font-semibold">Pay a Traffic Fine</span>
+              <ShieldAlert className="h-4 w-4 text-sw-danger" />
+              <span className="text-sm font-display font-semibold tracking-wide">Pay a Traffic Fine</span>
             </div>
           )}
 
@@ -275,11 +276,11 @@ export default function PaymentsPage() {
 
         {/* Error */}
         {!isPending && error && (
-          <Card className="border-destructive/30 bg-destructive/5">
+          <Card className="border-sw-danger/30 bg-sw-danger/5 panel-glow">
             <CardContent className="flex items-center gap-3 py-4 px-4">
-              <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+              <AlertTriangle className="h-5 w-5 shrink-0 text-sw-danger" />
               <div>
-                <p className="text-sm font-medium text-destructive">Search Failed</p>
+                <p className="text-sm font-medium text-sw-danger">Search Failed</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{error}</p>
               </div>
             </CardContent>
@@ -293,13 +294,13 @@ export default function PaymentsPage() {
               <ShieldAlert className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-semibold text-sm">No outstanding fines</p>
+              <p className="font-display font-semibold text-sm tracking-wide">No outstanding fines</p>
               <p className="text-xs text-muted-foreground mt-1">
                 No pending or confirmed violations found for{" "}
                 <span className="font-mono font-semibold text-foreground">{plate}</span>
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-sw-safe/30 bg-sw-safe/10 px-3 py-1 text-xs font-medium text-sw-safe">
               ✓ Clean record
             </span>
           </div>
@@ -319,7 +320,7 @@ export default function PaymentsPage() {
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Banknote className="h-3.5 w-3.5" />
                   Total:{" "}
-                  <span className="font-bold text-destructive">
+                  <span className="font-mono font-bold text-sw-danger">
                     RWF {totalDue.toLocaleString()}
                   </span>
                 </div>
@@ -337,15 +338,15 @@ export default function PaymentsPage() {
             {violations!.length > 1 && totalDue > 0 && (
               <>
                 <Separator />
-                <Card className="border-destructive/20 bg-destructive/5">
+                <Card className="border-sw-danger/20 bg-sw-danger/5 panel-glow">
                   <CardContent className="flex items-center justify-between gap-4 py-4 px-5">
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-display font-semibold tracking-wide">
                         {violations!.length} unpaid fines
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Total amount due:{" "}
-                        <span className="font-bold text-destructive">
+                        <span className="font-mono font-bold text-sw-danger">
                           RWF {totalDue.toLocaleString()}
                         </span>
                       </p>

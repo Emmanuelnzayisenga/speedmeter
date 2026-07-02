@@ -103,7 +103,7 @@ export function LiveMap({ vehicles, zones, selectedVehicleId, onVehicleClick, cl
         if (layer) {
           layer.addTo(map)
           layer.bindPopup(`
-            <div style="font-family: 'Rajdhani', sans-serif; min-width: 160px;">
+            <div style="font-family: var(--font-display), sans-serif; min-width: 160px;">
               <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">${zone.name}</div>
               <div style="font-size: 12px; opacity: 0.8;">Speed Limit: <strong>${zone.speedLimit} km/h</strong></div>
               <div style="font-size: 11px; opacity: 0.6; margin-top: 2px;">${zone.zoneType}</div>
@@ -164,7 +164,7 @@ export function LiveMap({ vehicles, zones, selectedVehicleId, onVehicleClick, cl
           <div style="
             position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
             background: ${isSpeeding ? '#EF444490' : '#00000090'};
-            color: white; font-size: 9px; font-family: 'Space Mono', monospace;
+            color: white; font-size: 9px; font-family: var(--font-mono), monospace;
             padding: 1px 5px; border-radius: 3px; white-space: nowrap;
             border: 1px solid ${isSpeeding ? '#EF444440' : '#ffffff20'};
           ">${Math.round(loc.speed)} km/h</div>
@@ -186,8 +186,8 @@ export function LiveMap({ vehicles, zones, selectedVehicleId, onVehicleClick, cl
         const marker = L.marker([loc.latitude, loc.longitude], { icon })
           .addTo(map)
           .bindPopup(`
-            <div style="font-family: 'Inter', sans-serif; min-width: 180px;">
-              <div style="font-weight: 700; font-size: 14px; font-family: 'Rajdhani', sans-serif; margin-bottom: 6px;">
+            <div style="font-family: var(--font-sans), sans-serif; min-width: 180px;">
+              <div style="font-weight: 700; font-size: 14px; font-family: var(--font-display), sans-serif; margin-bottom: 6px;">
                 ${vehicle.name}
               </div>
               <div style="display: grid; gap: 3px; font-size: 12px;">

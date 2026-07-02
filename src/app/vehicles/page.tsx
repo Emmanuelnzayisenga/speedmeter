@@ -5,8 +5,9 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/hooks/use-toast'
 import { formatDate, formatSpeed, VEHICLE_TYPE_ICONS, cn } from '@/lib/utils'
@@ -19,14 +20,14 @@ import 'react-phone-input-2/lib/style.css'
 
 const VEHICLE_TYPES = ['CAR', 'TRUCK', 'MOTORCYCLE', 'BUS', 'VAN', 'OTHER']
 const VEHICLE_STATUSES = ['ACTIVE', 'INACTIVE', 'MOVING', 'SPEEDING', 'OFFLINE']
-const STATUS_BADGE: Record<string, any> = {
+const STATUS_BADGE: Record<string, BadgeVariant> = {
   ACTIVE: 'success', MOVING: 'radar', SPEEDING: 'destructive', INACTIVE: 'default', OFFLINE: 'default'
 }
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4', '#F97316', '#EC4899']
 
 const emptyForm = {
   name: '', plateNumber: '', type: 'CAR', status: 'INACTIVE',
-  driverName: '', driverPhone: '', deviceId: '', color: '#3B82F6'
+  driverName: '', driverPhone: '', driverId: '', deviceId: '', color: '#3B82F6'
 }
 
 function ScrollButtonGroup<T extends string>({
@@ -74,6 +75,14 @@ export default function VehiclesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [drivers, setDrivers] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('/api/vehicles/available-drivers')
+      .then(res => res.json())
+      .then(data => setDrivers(data.drivers || []))
+      .catch(() => setDrivers([]))
+  }, [])
 
   const fetchVehicles = useCallback(async (page = 1) => {
     setLoading(true)
@@ -97,7 +106,7 @@ export default function VehiclesPage() {
     setEditingVehicle(v)
     setForm({
       name: v.name, plateNumber: v.plateNumber, type: v.type, status: v.status,
-      driverName: v.driverName || '', driverPhone: v.driverPhone || '',
+      driverName: v.driverName || '', driverPhone: v.driverPhone || '', driverId: v.driverId || '',
       deviceId: v.deviceId || '', color: v.color || '#3B82F6'
     })
     setDialogOpen(true)
@@ -478,6 +487,21 @@ export default function VehiclesPage() {
                 value={form.driverPhone}
                 onChange={(phone) => setForm({ ...form, driverPhone: phone })}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Driver Account</Label>
+              <Select value={form.driverId || 'none'} onValueChange={v => setForm(f => ({ ...f, driverId: v === 'none' ? '' : v }))}>
+                <SelectTrigger><SelectValue placeholder="No account linked" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No account linked</SelectItem>
+                  {drivers.map(d => (
+                    <SelectItem key={d.id} value={d.id} disabled={!!d.vehicle && d.vehicle.id !== editingVehicle?.id}>
+                      {d.username || d.email}{d.vehicle && d.vehicle.id !== editingVehicle?.id ? ` (assigned to ${d.vehicle.plateNumber})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">Lets this driver log in and see this vehicle on their own page. Create a DRIVER-role account first under Admin → Users.</p>
             </div>
             <div className="space-y-1.5">
               <Label>GPS Device ID</Label>

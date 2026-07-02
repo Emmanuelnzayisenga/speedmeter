@@ -1,22 +1,33 @@
-import { auth } from "@/lib/auth";
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import withAuth from "next-auth/middleware";
 
-declare module "next/server" {
-  interface NextRequest {
-    auth: any;
+export default withAuth(
+  function middleware(req) {
+    const role = req.nextauth.token?.role;
+    const { pathname } = req.nextUrl;
+
+    if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    // Drivers only ever see their own vehicle, its violations, their profile,
+    // and payment pages for their own fines - never the fleet-wide operational pages.
+    const driverAllowedPrefixes = ["/my-vehicle", "/profile", "/payments", "/logout"];
+    if (role === "DRIVER" && !driverAllowedPrefixes.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      return NextResponse.redirect(new URL("/my-vehicle", req.url));
+    }
+
+    return NextResponse.next();
+  },
+  {
+    pages: {
+      signIn: "/login",
+    },
   }
-}
-
-export default auth((req: NextRequest) => {
-  const isLoggedIn = !!req.auth;
-  const isAuthRoute = req.nextUrl.pathname.startsWith("/login");
-
-  if (!isLoggedIn && !isAuthRoute) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-  return NextResponse.next();
-});
+);
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|login|register|forgot-password|reset-password).*)",
+  ],
 };

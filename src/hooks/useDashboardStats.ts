@@ -76,7 +76,11 @@ export function useDashboardStats() {
 
   // ── WebSocket ───────────────────────────────────────────────────────────────
   const connectWS = useCallback(() => {
-    if (unmountedRef.current || !WS_URL) return
+    if (unmountedRef.current) return
+    if (!WS_URL) {
+      startPolling() // no WS endpoint configured - go straight to HTTP polling
+      return
+    }
 
     console.log(`🔌 Connecting to WS: ${WS_URL}`)
     const ws = new WebSocket(WS_URL)
@@ -125,6 +129,7 @@ export function useDashboardStats() {
     ws.onerror = () => {
       console.error(`❌ WS error on ${WS_URL}`)
       setConnected(false)
+      ws.close() // force onclose to fire deterministically so the polling fallback + reconnect timer kick in
     }
 
     ws.onclose = (event) => {

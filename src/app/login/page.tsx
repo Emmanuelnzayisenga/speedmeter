@@ -2,10 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AuthShell } from "@/components/auth/AuthShell";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 function Page() {
   const [error, setError] = useState<string | null>(null)
@@ -49,52 +52,54 @@ function Page() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-background p-6 rounded shadow-md w-full max-w-sm border"
-      >
-        <div className="flex flex-col justify-center gap-2 flex-1">
-          <label htmlFor="email">Email</label>
+    <AuthShell title="SIGN IN" subtitle="Fleet Monitor">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="email">Email</Label>
           <Input
             type="email"
             id="email"
             name="username"
-            placeholder="Enter your email"
+            placeholder="you@example.com"
             required
             onChange={handleChange}
           />
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <label htmlFor="password">Password</label>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
           <Input
             type="password"
             id="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             required
             onChange={handleChange}
           />
         </div>
 
         {error && (
-          <p className="text-sm text-red-500 mt-2">{error}</p>
+          <p className="text-sm text-sw-danger">{error}</p>
         )}
 
-        <Button className="p-2 w-full mt-4" disabled={isPending}>
-          {isPending ? "Signing in..." : "Submit"}
+        <Button className="w-full gap-2" disabled={isPending}>
+          {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isPending ? "Signing in…" : "Sign In"}
         </Button>
 
-        {/* <div className="mt-4 text-sm">
+        <p className="text-center text-xs text-muted-foreground pt-1">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-blue-500 hover:underline">
-            Register here
+          <Link href="/register" className="text-primary hover:underline">
+            Register
           </Link>
-        </div> */}
+        </p>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 

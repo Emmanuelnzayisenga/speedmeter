@@ -57,20 +57,20 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, plateNumber, type, driverName, driverPhone, deviceId, color } = body
+    const { name, plateNumber, type, driverName, driverPhone, driverId, deviceId, color } = body
 
     if (!name || !plateNumber) {
       return NextResponse.json({ error: 'Name and plate number are required' }, { status: 400 })
     }
 
     const vehicle = await prisma.vehicle.create({
-      data: { name, plateNumber, type, driverName, driverPhone, deviceId, color },
+      data: { name, plateNumber, type, driverName, driverPhone, driverId: driverId || null, deviceId, color },
     })
 
     return NextResponse.json(vehicle, { status: 201 })
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return NextResponse.json({ error: 'Plate number or device ID already exists' }, { status: 409 })
+      return NextResponse.json({ error: 'Plate number, device ID, or driver is already assigned to another vehicle' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Failed to create vehicle' }, { status: 500 })
   }

@@ -112,7 +112,7 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { label: 'Fleet Size', value: stats?.totalVehicles || 0, icon: Car, sub: `${stats?.activeVehicles || 0} active` },
-            { label: 'Week Violations', value: stats?.weekViolations || 0, icon: AlertTriangle, sub: `${stats?.violationTrend > 0 ? '↑' : '↓'} ${Math.abs(stats?.violationTrend || 0)}% trend` },
+            { label: 'Week Violations', value: stats?.weekViolations || 0, icon: AlertTriangle, sub: `${!stats?.violationTrend ? '→' : stats.violationTrend > 0 ? '↑' : '↓'} ${Math.abs(stats?.violationTrend || 0)}% trend` },
             { label: 'Total Fines', value: formatCurrency(stats?.totalFines || 0), icon: DollarSign, sub: `${formatCurrency(stats?.pendingFines || 0)} pending` },
             { label: 'Active Zones', value: stats?.activeZones || 0, icon: MapPin, sub: 'speed zones' },
           ].map(kpi => (

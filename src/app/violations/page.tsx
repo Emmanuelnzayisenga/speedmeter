@@ -5,7 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,7 +19,7 @@ import {
 import Link from 'next/link'
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'DISPUTED', 'RESOLVED', 'CANCELLED']
-const STATUS_BADGE: Record<string, any> = {
+const STATUS_BADGE: Record<string, BadgeVariant> = {
   PENDING: 'warning', CONFIRMED: 'destructive', DISPUTED: 'radar',
   RESOLVED: 'success', CANCELLED: 'default'
 }
@@ -41,24 +41,45 @@ export default function ViolationsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ status: '', fineAmount: '', notes: '' })
   const [saving, setSaving] = useState(false)
+  const [statusCounts, setStatusCounts] = useState({ PENDING: 0, CONFIRMED: 0 })
+  const requestIdRef = React.useRef(0)
 
   const fetchViolations = useCallback(async (page = 1) => {
     setLoading(true)
+    const requestId = ++requestIdRef.current
     try {
       const params = new URLSearchParams({ page: String(page), limit: '15' })
       if (search) params.set('search', search)
       if (statusFilter) params.set('status', statusFilter)
       const res = await fetch(`/api/violations?${params}`)
       const data = await res.json()
+      if (requestId !== requestIdRef.current) return // a newer request has since started; discard this stale response
       setViolations(data.violations || [])
       setTotalFines(data.totalFines || 0)
       setPagination(data.pagination || { page: 1, totalPages: 1, total: 0 })
     } finally {
-      setLoading(false)
+      if (requestId === requestIdRef.current) setLoading(false)
     }
   }, [search, statusFilter])
 
+  const fetchStatusCounts = useCallback(async () => {
+    try {
+      const [pendingRes, confirmedRes] = await Promise.all([
+        fetch('/api/violations?status=PENDING&limit=1'),
+        fetch('/api/violations?status=CONFIRMED&limit=1'),
+      ])
+      const [pendingData, confirmedData] = await Promise.all([pendingRes.json(), confirmedRes.json()])
+      setStatusCounts({
+        PENDING: pendingData.pagination?.total || 0,
+        CONFIRMED: confirmedData.pagination?.total || 0,
+      })
+    } catch {
+      // non-critical KPI, leave previous counts on failure
+    }
+  }, [])
+
   useEffect(() => { fetchViolations(1) }, [fetchViolations])
+  useEffect(() => { fetchStatusCounts() }, [fetchStatusCounts])
 
   const openEdit = (v: any) => {
     setEditViolation(v)
@@ -78,6 +99,7 @@ export default function ViolationsPage() {
       toast({ title: 'Violation updated' })
       setEditViolation(null)
       fetchViolations(pagination.page)
+      fetchStatusCounts()
     } catch (e: any) {
       toast({ title: 'Error', description: e.message, variant: 'destructive' })
     } finally {
@@ -92,6 +114,7 @@ export default function ViolationsPage() {
       toast({ title: 'Violation deleted' })
       setDeleteId(null)
       fetchViolations(pagination.page)
+      fetchStatusCounts()
     } catch {
       toast({ title: 'Error', variant: 'destructive' })
     }
@@ -106,13 +129,14 @@ export default function ViolationsPage() {
       })
       toast({ title: 'Violation resolved' })
       fetchViolations(pagination.page)
+      fetchStatusCounts()
     } catch {
       toast({ title: 'Error', variant: 'destructive' })
     }
   }
 
-  const pendingCount = violations.filter(v => v.status === 'PENDING').length
-  const confirmedCount = violations.filter(v => v.status === 'CONFIRMED').length
+  const pendingCount = statusCounts.PENDING
+  const confirmedCount = statusCounts.CONFIRMED
 
   return (
     <AppLayout>
@@ -148,7 +172,7 @@ export default function ViolationsPage() {
             <Input placeholder="Search by vehicle, zone..." value={search}
               onChange={e => setSearch(e.target.value)} className="pl-9 bg-card" />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter || 'all'} onValueChange={v => setStatusFilter(v === 'all' ? '' : v)}>
             <SelectTrigger className="w-full sm:w-44 bg-card">
               <Filter className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
               <SelectValue placeholder="All statuses" />

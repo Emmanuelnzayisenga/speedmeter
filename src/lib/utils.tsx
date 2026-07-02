@@ -42,26 +42,7 @@ export function calculateFine(excessSpeed: number): number {
   return 50000
 }
 
-export function haversineDistance(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number
-): number {
-  const R = 6371000
-  const φ1 = (lat1 * Math.PI) / 180
-  const φ2 = (lat2 * Math.PI) / 180
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180
-  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
-
-export function pointInCircle(
-  lat: number, lng: number,
-  centerLat: number, centerLng: number,
-  radiusMeters: number
-): boolean {
-  return haversineDistance(lat, lng, centerLat, centerLng) <= radiusMeters
-}
+export { haversineDistance, pointInCircle } from './geo'
 
 export const VEHICLE_TYPE_ICONS: Record<string, any> = {
   CAR: <Car/>,

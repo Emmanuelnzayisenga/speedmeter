@@ -3,8 +3,6 @@
 @tailwind utilities;
 @import 'leaflet/dist/leaflet.css';
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
-
 @layer base {
   :root {
     /* Base shadcn colors - Dark theme by default */
@@ -46,10 +44,6 @@
     --sw-danger: 0 84% 60%;         /* Red - danger/violation */
     --sw-nav: 220 20% 8%;           /* Nav background */
     --sw-panel: 220 20% 11%;        /* Panel background */
-
-    /* Font families */
-    --font-display: 'Rajdhani', sans-serif;
-    --font-mono: 'Space Mono', monospace;
   }
 }
 
@@ -58,11 +52,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    @apply bg-background text-foreground font-sans;
   }
   h1, h2, h3 {
-    font-family: 'Rajdhani', sans-serif;
+    @apply font-display;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -71,7 +64,7 @@
 /* Leaflet overrides */
 .leaflet-container {
   background: hsl(220 20% 10%) !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-sans), sans-serif !important;
 }
 
 .leaflet-tile-pane {

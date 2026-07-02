@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { LiveMap } from '@/components/map/LiveMap'
 import { VehicleListPanel } from '@/components/dashboard/VehicleListPanel'
@@ -19,17 +19,30 @@ export default function DashboardPage() {
   const { data, connected, error, refetch, liveData, zones } = useDashboardStats()
 
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
-  const [selectedVehicle, setSelectedVehicle]     = useState<any | null>(null)
+  const [speedAhead, setSpeedAhead] = useState<{ distanceMeters: number; etaSeconds: number | null; zone: { name: string; speedLimit: number } } | null>(null)
+
+  // Derived from live data (not a snapshot) so the detail panel stays in sync as new positions arrive.
+  const selectedVehicle = selectedVehicleId
+    ? liveData?.vehicles.find((v: any) => v.id === selectedVehicleId) ?? null
+    : null
 
   const handleVehicleSelect = useCallback((vehicle: any) => {
     setSelectedVehicleId(vehicle.id)
-    setSelectedVehicle(vehicle)
   }, [])
 
+  useEffect(() => {
+    if (!selectedVehicleId) { setSpeedAhead(null); return }
+    let cancelled = false
+    fetch(`/api/speed-limit/ahead?vehicleId=${selectedVehicleId}`)
+      .then(res => res.json())
+      .then(data => { if (!cancelled) setSpeedAhead(data.zone ? data : null) })
+      .catch(() => { if (!cancelled) setSpeedAhead(null) })
+    return () => { cancelled = true }
+  }, [selectedVehicleId])
+
   const handleMapVehicleClick = useCallback((id: string) => {
-    const v = liveData?.vehicles.find((v: any) => v.id === id)
-    if (v) { setSelectedVehicleId(id); setSelectedVehicle(v) }
-  }, [liveData])
+    setSelectedVehicleId(id)
+  }, [])
 
   const stats    = data?.stats
   const vehicles = liveData?.vehicles || []
@@ -185,7 +198,7 @@ export default function DashboardPage() {
                 <span className="text-xs font-display font-semibold tracking-wider">VEHICLE DETAIL</span>
                 <Button
                   variant="ghost" size="icon" className="w-6 h-6"
-                  onClick={() => { setSelectedVehicleId(null); setSelectedVehicle(null) }}
+                  onClick={() => setSelectedVehicleId(null)}
                 >
                   <X className="w-3.5 h-3.5" />
                 </Button>
@@ -291,6 +304,23 @@ export default function DashboardPage() {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">LNG</span>
                         <span>{selectedVehicle.locations[0].longitude.toFixed(6)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Speed limit ahead */}
+                {speedAhead?.zone && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Speed Limit Ahead</p>
+                    <div className="bg-secondary/50 rounded-md p-2.5 flex items-center gap-2.5">
+                      <Navigation className="w-4 h-4 text-primary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-mono font-bold">{speedAhead.zone.speedLimit} km/h</p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {speedAhead.zone.name} · {speedAhead.distanceMeters}m
+                          {speedAhead.etaSeconds ? ` · ~${Math.round(speedAhead.etaSeconds)}s` : ''}
+                        </p>
                       </div>
                     </div>
                   </div>

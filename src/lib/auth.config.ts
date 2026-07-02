@@ -3,9 +3,10 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { Role } from "@/app/generated/prisma";
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  username: z.string().email(),
   password: z.string().min(1),
 });
 
@@ -14,14 +15,14 @@ export const authConfig: NextAuthOptions = {
     Credentials({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const { email, password } = parsed.data;
+        const { username: email, password } = parsed.data;
 
         const user = await prisma.user.findFirst({
           where: { email },
@@ -44,6 +45,7 @@ export const authConfig: NextAuthOptions = {
           email: user.email,
           username: user.username,
           phoneNumber: user.phoneNumber,
+          role: user.role,
         };
       },
     }),
@@ -58,6 +60,7 @@ export const authConfig: NextAuthOptions = {
         token.id = user.id;
         token.username = user.username;
         token.phoneNumber = user.phoneNumber;
+        token.role = user.role;
       }
       return token;
     },
@@ -66,9 +69,11 @@ export const authConfig: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.username = token.username as string | null;
         session.user.phoneNumber = token.phoneNumber as string;
+        session.user.role = token.role as Role;
       }
       return session;
     },
   },
   session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET,
 };

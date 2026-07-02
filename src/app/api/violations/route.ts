@@ -1,15 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+const VIOLATION_STATUSES = ['PENDING', 'CONFIRMED', 'DISPUTED', 'RESOLVED', 'CANCELLED']
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
+    const pageParam = parseInt(searchParams.get('page') || '1')
+    const limitParam = parseInt(searchParams.get('limit') || '20')
+    const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1
+    const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : 20
     const status = searchParams.get('status') || ''
     const vehicleId = searchParams.get('vehicleId') || ''
     const search = searchParams.get('search') || ''
     const skip = (page - 1) * limit
+
+    if (status && !VIOLATION_STATUSES.includes(status)) {
+      return NextResponse.json(
+        { error: `status must be one of ${VIOLATION_STATUSES.join(', ')}` },
+        { status: 400 }
+      )
+    }
 
     const where: any = {}
     if (status) where.status = status
@@ -61,15 +72,21 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { vehicleId, zoneId, latitude, longitude, speed, speedLimit, excessSpeed, fineAmount, notes } = body
 
-    if (!vehicleId || !latitude || !longitude || speed === undefined || !speedLimit) {
+    if (
+      !vehicleId ||
+      latitude === undefined || latitude === null ||
+      longitude === undefined || longitude === null ||
+      speed === undefined || speed === null ||
+      speedLimit === undefined || speedLimit === null
+    ) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
     const violation = await prisma.violation.create({
       data: {
         vehicleId, zoneId, latitude, longitude, speed, speedLimit,
-        excessSpeed: excessSpeed || (speed - speedLimit),
-        fineAmount: fineAmount || 0, notes,
+        excessSpeed: excessSpeed !== undefined && excessSpeed !== null ? excessSpeed : (speed - speedLimit),
+        fineAmount: fineAmount !== undefined && fineAmount !== null ? fineAmount : 0, notes,
       },
       include: {
         vehicle: { select: { name: true, plateNumber: true } },

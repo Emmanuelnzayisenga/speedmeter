@@ -120,8 +120,9 @@ module.exports = {
         shimmer: "shimmer 2s linear infinite",
       },
       fontFamily: {
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
     },
   },

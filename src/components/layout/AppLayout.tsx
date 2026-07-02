@@ -6,18 +6,24 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   Activity, Map, Car, AlertTriangle, BarChart2,
-  ChevronLeft, ChevronRight, Gauge, Shield, Menu, X, LogOut
+  ChevronLeft, ChevronRight, Gauge, Shield, Menu, X, LogOut, User
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { SessionProvider } from 'next-auth/react'
+import { SessionProvider, useSession } from 'next-auth/react'
+import type { Role } from '@/app/generated/prisma'
 
-const navItems = [
-  { href: '/dashboard', label: 'Live Monitor', icon: Activity, badge: 'LIVE' },
-  { href: '/map', label: 'Zone Manager', icon: Map },
-  { href: '/vehicles', label: 'Vehicles', icon: Car },
-  { href: '/violations', label: 'Violations', icon: AlertTriangle },
-  { href: '/analytics', label: 'Analytics', icon: BarChart2 },
-  {href: '/register', label: 'Add new user', icon: Shield },
+const FLEET_ROLES: Role[] = ['ADMIN', 'OPERATOR', 'VIEWER']
+
+const navItems: { href: string; label: string; icon: typeof Activity; badge?: string; roles?: Role[] }[] = [
+  { href: '/dashboard', label: 'Live Monitor', icon: Activity, badge: 'LIVE', roles: FLEET_ROLES },
+  { href: '/map', label: 'Zone Manager', icon: Map, roles: FLEET_ROLES },
+  { href: '/vehicles', label: 'Vehicles', icon: Car, roles: FLEET_ROLES },
+  { href: '/violations', label: 'Violations', icon: AlertTriangle, roles: FLEET_ROLES },
+  { href: '/analytics', label: 'Analytics', icon: BarChart2, roles: FLEET_ROLES },
+  { href: '/my-vehicle', label: 'My Vehicle', icon: Car, roles: ['DRIVER'] },
+  { href: '/my-vehicle/violations', label: 'My Violations', icon: AlertTriangle, roles: ['DRIVER'] },
+  { href: '/admin', label: 'Admin', icon: Shield, roles: ['ADMIN'] },
+  { href: '/profile', label: 'Profile', icon: User },
   { href: '/logout', label: 'Logout', icon: LogOut },
 ]
 
@@ -25,17 +31,21 @@ interface AppLayoutProps {
   children: React.ReactNode
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+function AppLayoutInner({ children }: AppLayoutProps) {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const visibleNavItems = navItems.filter(
+    (item) => !item.roles || (session?.user?.role && item.roles.includes(session.user.role))
+  )
+
   const activeLabel =
-    navItems.find(n => n.href === pathname || (n.href !== '/' && pathname.startsWith(n.href)))?.label
+    visibleNavItems.find(n => n.href === pathname || (n.href !== '/' && pathname.startsWith(n.href)))?.label
     ?? 'Live Monitor'
 
   return (
-    <SessionProvider>
       <div className="flex h-screen bg-background overflow-hidden">
         {mobileOpen && (
           <div
@@ -79,7 +89,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
               return (
                 <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
@@ -148,6 +158,13 @@ export function AppLayout({ children }: AppLayoutProps) {
           </main>
         </div>
       </div>
+  )
+}
+
+export function AppLayout({ children }: AppLayoutProps) {
+  return (
+    <SessionProvider>
+      <AppLayoutInner>{children}</AppLayoutInner>
     </SessionProvider>
   )
 }
