@@ -14,7 +14,7 @@ model User {
   username          String?               @map("username")     @db.VarChar(255)
   email               String                @map("email")        @db.VarChar(255)
   phoneNumber         String                @map("phone_number")     @db.VarChar(20)
-  role                Role                  @map("role")            @default(VIEWER)
+  role                Role                  @map("role")            @default(DRIVER)
   isActive            Boolean               @map("is_active")       @default(false)
   lastLogin           DateTime?             @map("last_login")
   createdAt           DateTime              @map("created_at")      @default(now())
@@ -41,8 +41,6 @@ model PasswordResetToken {
 
 enum Role {
   ADMIN
-  OPERATOR
-  VIEWER
   DRIVER
 }
 

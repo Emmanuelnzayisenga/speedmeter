@@ -15,13 +15,13 @@ import {
   RefreshCw, ShieldCheck, Filter
 } from 'lucide-react'
 
-const ROLES = ['ADMIN', 'OPERATOR', 'VIEWER', 'DRIVER']
+const ROLES = ['ADMIN', 'DRIVER']
 const ROLE_BADGE: Record<string, BadgeVariant> = {
-  ADMIN: 'destructive', OPERATOR: 'radar', VIEWER: 'default', DRIVER: 'success',
+  ADMIN: 'destructive', DRIVER: 'success',
 }
 
 const emptyForm = {
-  username: '', email: '', password: '', phoneNumber: '', role: 'VIEWER',
+  username: '', email: '', password: '', phoneNumber: '', role: 'DRIVER',
 }
 
 export default function AdminUsersPage() {

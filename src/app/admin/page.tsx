@@ -9,7 +9,7 @@ import { formatDate } from '@/lib/utils'
 import { Users, ShieldCheck, Car, AlertTriangle, UserCog, Settings, ArrowRight } from 'lucide-react'
 
 const ROLE_BADGE: Record<string, BadgeVariant> = {
-  ADMIN: 'destructive', OPERATOR: 'radar', VIEWER: 'default', DRIVER: 'success',
+  ADMIN: 'destructive', DRIVER: 'success',
 }
 
 export default function AdminOverviewPage() {

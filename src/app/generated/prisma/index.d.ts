@@ -60,8 +60,6 @@ export type SystemSettings = $Result.DefaultSelection<Prisma.$SystemSettingsPayl
 export namespace $Enums {
   export const Role: {
   ADMIN: 'ADMIN',
-  OPERATOR: 'OPERATOR',
-  VIEWER: 'VIEWER',
   DRIVER: 'DRIVER'
 };
 

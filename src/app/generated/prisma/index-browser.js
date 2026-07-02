@@ -243,8 +243,6 @@ exports.Prisma.JsonNullValueFilter = {
 };
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
-  OPERATOR: 'OPERATOR',
-  VIEWER: 'VIEWER',
   DRIVER: 'DRIVER'
 };
 

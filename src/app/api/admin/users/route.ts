@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         email,
         phoneNumber,
         password: await bcrypt.hash(password, 10),
-        role: role || 'VIEWER',
+        role: role || 'DRIVER',
         isActive: true,
       },
       select: {

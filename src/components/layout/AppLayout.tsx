@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { SessionProvider, useSession } from 'next-auth/react'
 import type { Role } from '@/app/generated/prisma'
 
-const FLEET_ROLES: Role[] = ['ADMIN', 'OPERATOR', 'VIEWER']
+const FLEET_ROLES: Role[] = ['ADMIN']
 
 const navItems: { href: string; label: string; icon: typeof Activity; badge?: string; roles?: Role[] }[] = [
   { href: '/dashboard', label: 'Live Monitor', icon: Activity, badge: 'LIVE', roles: FLEET_ROLES },

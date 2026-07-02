@@ -11,7 +11,7 @@ import { formatDate } from '@/lib/utils'
 import { User, Lock, Save, RefreshCw, Mail, Shield } from 'lucide-react'
 
 const ROLE_BADGE: Record<string, BadgeVariant> = {
-  ADMIN: 'destructive', OPERATOR: 'radar', VIEWER: 'default', DRIVER: 'success',
+  ADMIN: 'destructive', DRIVER: 'success',
 }
 
 export default function ProfilePage() {
