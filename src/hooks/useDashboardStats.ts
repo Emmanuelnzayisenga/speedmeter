@@ -25,7 +25,7 @@ interface LiveData {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const WS_URL          = process.env.NEXT_PUBLIC_WS_URL!   // e.g. ws://192.168.1.100:3001/ws/dashboard
-const POLL_INTERVAL   = 10_000
+const POLL_INTERVAL   = 3_000
 const RECONNECT_DELAY = 5_000
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export function useDashboardStats() {
 
   const startPolling = useCallback(() => {
     if (pollRef.current) return
-    console.warn('⚠️ WS unavailable — falling back to HTTP polling every 10s')
+    console.warn(`⚠️ WS unavailable — falling back to HTTP polling every ${POLL_INTERVAL / 1000}s`)
     fetchHttp()
     pollRef.current = setInterval(fetchHttp, POLL_INTERVAL)
   }, [fetchHttp])
