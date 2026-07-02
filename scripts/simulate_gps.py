@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 """
-Simulates a moving GPS tracker by POSTing frames to /api/gps/ingest,
-the same endpoint the real ESP8266 firmware hits. Lets you drive a
-vehicle around on the live dashboard from the terminal to test
-real-time map updates without physical hardware.
+Simulates a moving "phone location" by POSTing frames to /api/p, the
+endpoint the ESP8266 firmware itself polls every 2s (fetchPhoneLocation)
+for an override location/speed. Per the firmware's resolveActiveLocation(),
+phone data takes priority over the device's own GPS whenever it's fresh
+(< 15s old) - so this lets you drive a vehicle around and have the real
+physical device pick up the simulated speed, display it, and relay it
+onward through its own WebSocket connection exactly like a real phone
+companion app would.
+
+Note: this is a different pipeline from /api/gps/ingest (which writes
+directly to VehicleLocation and bypasses the device entirely). Use
+--url .../api/gps/ingest instead if you want to feed the dashboard
+directly without a physical device in the loop.
 
 Usage:
     pip install requests
@@ -155,12 +164,12 @@ class Simulator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Simulate a moving GPS device against /api/gps/ingest")
-    parser.add_argument("--url", default="https://speedmeter-rceq.onrender.com/api/gps/ingest",
-                         help="Full ingest endpoint URL")
+    parser = argparse.ArgumentParser(description="Simulate a moving phone location against /api/p, polled by the ESP8266 device")
+    parser.add_argument("--url", default="https://speedmeter-rceq.onrender.com/api/p",
+                         help="Full endpoint URL (default: /api/p, what the device polls)")
     parser.add_argument("--device", default="DEVICE_1", help="deviceId to simulate")
-    parser.add_argument("--lat", type=float, default=-2.23464, help="Starting latitude")
-    parser.add_argument("--lng", type=float, default=29.78465, help="Starting longitude")
+    parser.add_argument("--lat", type=float, default=-1.677235, help="Starting latitude (default: inside the 'mukoto' zone)")
+    parser.add_argument("--lng", type=float, default=29.892139, help="Starting longitude (default: inside the 'mukoto' zone)")
     parser.add_argument("--interval", type=float, default=1.5, help="Seconds between frames")
     args = parser.parse_args()
 

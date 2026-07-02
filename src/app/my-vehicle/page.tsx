@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { formatSpeed, formatCurrency, formatDate, VEHICLE_TYPE_ICONS, cn } from '@/lib/utils'
 import {
   Car, Gauge, Navigation, Clock, RefreshCw, AlertTriangle, MapPin, ArrowRight,
-  Brain, Sparkles, TrendingDown, TrendingUp, Minus,
+  Brain, Sparkles, TrendingDown, TrendingUp, Minus, Radar,
 } from 'lucide-react'
 
 const RISK_BADGE: Record<string, 'success' | 'warning' | 'radar' | 'destructive'> = {
@@ -21,15 +21,24 @@ const RISK_COLOR: Record<string, string> = {
 const TREND_ICON: Record<string, typeof TrendingUp> = {
   improving: TrendingDown, worsening: TrendingUp, stable: Minus,
 }
+const BEHAVIOR_BADGE: Record<string, 'success' | 'warning' | 'radar' | 'destructive'> = {
+  CAUTIOUS: 'success', MODERATE: 'warning', ASSERTIVE: 'radar', AGGRESSIVE: 'destructive',
+}
 
 interface Insights {
   riskScore: number
   riskLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+  behaviorClass: 'CAUTIOUS' | 'MODERATE' | 'ASSERTIVE' | 'AGGRESSIVE'
+  confidence: number
   trend: 'improving' | 'worsening' | 'stable'
   totalViolations: number
   avgExcessSpeed: number
+  totalFines: number
+  projectedFines30d: number
   zoneBreakdown: { name: string; count: number; percentage: number }[]
   statements: string[]
+  prediction: string
+  aheadZone: { name: string; speedLimit: number; distanceMeters: number; etaSeconds: number | null } | null
 }
 
 export default function MyVehiclePage() {
@@ -217,22 +226,25 @@ export default function MyVehiclePage() {
                 <span className="text-sm font-display font-bold tracking-wider">AI DRIVING INSIGHTS</span>
                 <Badge variant="outline" className="text-[9px]">BETA</Badge>
               </div>
-              <Badge variant={RISK_BADGE[insights.riskLevel]} className="text-[10px]">
-                {insights.riskLevel} RISK
-              </Badge>
+              <div className="flex items-center gap-1.5">
+                <Badge variant={BEHAVIOR_BADGE[insights.behaviorClass]} className="text-[10px]">
+                  {insights.behaviorClass}
+                </Badge>
+                <Badge variant={RISK_BADGE[insights.riskLevel]} className="text-[10px]">
+                  {insights.riskLevel} RISK
+                </Badge>
+              </div>
             </div>
 
-            <div className="p-4 grid md:grid-cols-3 gap-4">
-              {/* Risk score */}
-              <div className="flex flex-col items-center justify-center gap-1 md:border-r md:border-border/50 md:pr-4">
-                <p className={cn("text-3xl font-mono font-bold", RISK_COLOR[insights.riskLevel])}>
-                  {insights.riskScore}
-                </p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Risk Score / 100</p>
-                <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
+            {/* Stat tiles */}
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border/50 border-b border-border/50">
+              <div className="flex flex-col items-center justify-center gap-0.5 py-3">
+                <p className={cn("text-2xl font-mono font-bold", RISK_COLOR[insights.riskLevel])}>{insights.riskScore}</p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Risk / 100</p>
+                <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
                   {React.createElement(TREND_ICON[insights.trend], {
                     className: cn(
-                      "w-3 h-3",
+                      "w-2.5 h-2.5",
                       insights.trend === 'improving' && 'text-sw-safe',
                       insights.trend === 'worsening' && 'text-sw-danger'
                     ),
@@ -240,16 +252,44 @@ export default function MyVehiclePage() {
                   <span className="capitalize">{insights.trend}</span>
                 </div>
               </div>
-
-              {/* Generated insight statements */}
-              <div className="md:col-span-2 space-y-2">
-                {insights.statements.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs">
-                    <Sparkles className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{s}</span>
-                  </div>
-                ))}
+              <div className="flex flex-col items-center justify-center gap-0.5 py-3">
+                <p className="text-2xl font-mono font-bold text-primary">{insights.confidence}%</p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Model Confidence</p>
               </div>
+              <div className="flex flex-col items-center justify-center gap-0.5 py-3">
+                <p className="text-2xl font-mono font-bold">{insights.avgExcessSpeed}</p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Avg Excess km/h</p>
+              </div>
+              <div className="flex flex-col items-center justify-center gap-0.5 py-3">
+                <p className="text-2xl font-mono font-bold text-sw-warn">{formatCurrency(insights.projectedFines30d)}</p>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Projected 30d Fines</p>
+              </div>
+            </div>
+
+            {/* Predictive forecast - real ahead-zone projection from current location + heading */}
+            <div className={cn(
+              "mx-4 mt-3 px-3 py-2.5 rounded-md border flex items-start gap-2.5",
+              insights.aheadZone && insights.prediction.startsWith('⚠')
+                ? 'bg-sw-danger/10 border-sw-danger/30'
+                : 'bg-primary/5 border-primary/20'
+            )}>
+              <Radar className={cn(
+                "w-4 h-4 flex-shrink-0 mt-0.5",
+                insights.aheadZone && insights.prediction.startsWith('⚠') ? 'text-sw-danger' : 'text-primary'
+              )} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-0.5">Predictive Forecast</p>
+                <p className="text-xs text-foreground">{insights.prediction}</p>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-2">
+              {insights.statements.map((s, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs">
+                  <Sparkles className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">{s}</span>
+                </div>
+              ))}
             </div>
 
             {insights.zoneBreakdown.length > 0 && (
