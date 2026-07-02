@@ -25,6 +25,12 @@ function toInt(value: unknown): number | null {
   return null
 }
 
+function toDate(value: unknown): Date {
+  if (!value) return new Date()
+  const d = new Date(value as any)
+  return isNaN(d.getTime()) ? new Date() : d
+}
+
 // ─── POST /api/gps/ingest ────────────────────────────────────────────────────
 
 const SMS_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes per vehicle+zone
@@ -103,7 +109,7 @@ export async function POST(req: NextRequest) {
         altitude:   toFloat(altitude) || null,
         accuracy:   toFloat(accuracy) || null,
         satellites: toInt(satellites),
-        timestamp:  timestamp ? new Date(timestamp) : new Date(),
+        timestamp:  toDate(timestamp),
       },
     })
 
@@ -223,7 +229,7 @@ export async function PUT(req: NextRequest) {
             longitude: toFloat(reading.longitude),
             speed:     toFloat(reading.speed),
             heading:   reading.heading ? toFloat(reading.heading) : null,
-            timestamp: reading.timestamp ? new Date(reading.timestamp) : new Date(),
+            timestamp: toDate(reading.timestamp),
           },
         })
 

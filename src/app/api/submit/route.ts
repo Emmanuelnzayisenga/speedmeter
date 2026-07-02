@@ -10,6 +10,12 @@ function calculateFine(excessSpeed: number): number {
   return 50000
 }
 
+function toDate(value: unknown): Date {
+  if (!value) return new Date()
+  const d = new Date(value as any)
+  return isNaN(d.getTime()) ? new Date() : d
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -34,7 +40,7 @@ export async function POST(req: NextRequest) {
         altitude: altitude ? parseFloat(altitude) : null,
         accuracy: accuracy ? parseFloat(accuracy) : null,
         satellites: satellites ? parseInt(satellites) : null,
-        timestamp: timestamp ? new Date() : new Date(),
+        timestamp: toDate(timestamp),
       },
     })
 
@@ -109,7 +115,7 @@ export async function PUT(req: NextRequest) {
             longitude: reading.longitude,
             speed: reading.speed,
             heading: reading.heading,
-            timestamp:  new Date(),
+            timestamp: toDate(reading.timestamp),
           },
         })
 
